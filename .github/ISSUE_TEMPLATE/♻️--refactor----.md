@@ -2,7 +2,7 @@
 name: "♻️ [Refactor] - "
 about: 'Create new issue in AgriData-Lab/Frontend: ♻️ Refactor'
 title: ''
-labels: refactor
+labels: bug, refactor
 assignees: ''
 
 ---
