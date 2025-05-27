@@ -1,6 +1,6 @@
 ---
 name: "✨ [Feature] - "
-about: 'Create new issue in AgriData-Lab/Backend: ✨ Feature request'
+about: 'Create new issue in AgriData-Lab/Frontend: ✨ Feature request'
 title: ''
 labels: feature
 assignees: ''
