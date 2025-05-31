@@ -1,10 +1,10 @@
 import React from "react";
 import './Header.css';
 
-const Header = ({ toggleSidebar }) => {
+const Header = ({ toggleSidebar, isOpen }) => {
   return (
     <header className="header">
-      <button className="menu-button" onClick={toggleSidebar}>
+      <button className={`menu-button ${isOpen ? 'open' : ''}`} onClick={toggleSidebar}>
         <span></span>
         <span></span>
         <span></span>
