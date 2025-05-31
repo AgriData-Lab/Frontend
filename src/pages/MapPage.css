@@ -1,6 +1,23 @@
 .leaflet-container {
   width: 100%;
   height: 100%;
+  background: #f8f9fa;
+}
+
+/* 지도 타일 스타일링 */
+.map-tiles {
+  filter: grayscale(20%) brightness(105%);
+}
+
+/* 팝업 스타일링 */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.leaflet-popup-content {
+  margin: 8px;
+  text-align: center;
 }
 
 /* 필요한 Leaflet 기본 스타일 */
@@ -17,4 +34,23 @@
   position: absolute;
   left: 0;
   top: 0;
+}
+
+/* 줌 컨트롤 위치 조정 */
+.leaflet-control-zoom {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  border: none !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
+}
+
+.leaflet-control-zoom a {
+  background: white !important;
+  color: #666 !important;
+  width: 32px !important;
+  height: 32px !important;
+  line-height: 32px !important;
+  border-radius: 4px !important;
+  border: none !important;
 } 

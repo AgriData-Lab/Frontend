@@ -1,27 +1,30 @@
-// pages/MapPage.tsx
-import React from "react";
+import React, { useState } from "react";
 import MapFilterButtons from "../components/map/MapFilterButtons";
 import RegionMap from "../components/map/RegionMap";
-import './MapPage.css';
+import Header from "../components/Header";
+import Sidebar from "../components/map/SideBar";
+import "./MapPage.css";
 
 const MapPage = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
   return (
-    <div className="flex w-full h-screen">
-      {/* 사이드 메뉴 */}
-      <aside className="w-20 bg-pink-200 flex flex-col items-center pt-6 space-y-4 z-10">
-        <div className="space-y-1">
-          <div className="w-8 h-1 bg-white rounded"></div>
-          <div className="w-8 h-1 bg-white rounded"></div>
-          <div className="w-8 h-1 bg-white rounded"></div>
-        </div>
-        <MapFilterButtons />
-      </aside>
+    <div className="relative w-full h-screen overflow-hidden">
+      {/* 상단바 */}
+      <Header toggleSidebar={toggleSidebar} />
+
+      {/* 왼쪽 사이드바 */}
+      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 
       {/* 지도 영역 */}
-      <main className="flex-1 relative" style={{ height: '100vh' }}>
-        <div style={{ width: '100%', height: '100%' }}>
+      <main className="pt-12 flex-1 relative" style={{ height: "100vh" }}>
+        <div style={{ width: "100%", height: "100%" }}>
           <RegionMap />
         </div>
+
+        {/* 기존 MapFilterButtons는 상단 메뉴에 옮겼으므로 필요시 제거 */}
       </main>
     </div>
   );

@@ -6,20 +6,12 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import axios from "../../api/axiosInstance";
 
-// Leaflet 기본 아이콘 관련 설정
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-});
-
-// 기본 마커 커스터마이징 (스타 마커 이미지 등은 원하면 추가 가능)
+// 커스텀 마커 아이콘 설정
 const customIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/1828/1828884.png", // 별 모양 아이콘 예시
-  iconSize: [30, 30],
-  iconAnchor: [15, 30],
-  popupAnchor: [0, -30],
+  iconUrl: "https://cdn-icons-png.flaticon.com/512/2377/2377874.png", // 빨간색 마커 아이콘
+  iconSize: [35, 35],
+  iconAnchor: [17, 35],
+  popupAnchor: [0, -35],
 });
 
 const RegionMap = () => {
@@ -34,7 +26,6 @@ const RegionMap = () => {
         }
       } catch (error) {
         console.error("Failed to fetch map data:", error);
-        // API 호출 실패시 dummy data 사용
       }
     };
 
@@ -43,13 +34,15 @@ const RegionMap = () => {
 
   return (
     <MapContainer 
-      center={[36.5, 127.5]} 
+      center={[35.8, 127.5]} 
       zoom={7} 
       style={{ width: "100%", height: "100%" }}
+      zoomControl={false} // 줌 컨트롤 위치 변경
     >
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        className="map-tiles"
       />
       {markers.map((marker) => (
         <Marker
@@ -57,7 +50,11 @@ const RegionMap = () => {
           position={[marker.lat, marker.lng]}
           icon={customIcon}
         >
-          <Popup>{marker.name}</Popup>
+          <Popup>
+            <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
+              {marker.name}
+            </div>
+          </Popup>
         </Marker>
       ))}
     </MapContainer>
