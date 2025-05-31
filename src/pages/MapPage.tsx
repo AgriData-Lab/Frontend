@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import RegionMap from '../components/map/RegionMap';
 import Sidebar from '../components/common/SideBar.tsx';
-import Header from '../components/common/Header.js';
+import Header from '../components/common/Header.tsx';
 import './MapPage.css';
 
 const MapPage = () => {

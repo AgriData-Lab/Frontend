@@ -26,6 +26,8 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     { path: '/map', label: '기본 지도' },
     { path: '/map/distribution', label: '유통 시설 분포' },
     { path: '/map/price', label: '전국 시세 분포' },
+    { path: '/',label: '구매 시세' },// 추후 api 수정
+    { path: '/',label: '출하 시세' },// 추후 api 수정
   ];
 
   return (
