@@ -1,0 +1,66 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  height: 100%;
+  width: 280px;
+  background-color: rgba(255, 255, 255, 0.95);
+  transition: left 0.3s ease-in-out;
+  z-index: 1000;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.sidebar-content {
+  padding: 20px;
+  padding-top: 60px;
+}
+
+.filter-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-btn {
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: 1px solid #e0e0e0;
+  background: white;
+  color: #666;
+  font-size: 14px;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  background: #f8f8f8;
+}
+
+.filter-btn.active {
+  background: #ff4b4b;
+  color: white;
+  border-color: #ff4b4b;
+}
+
+.menu-items {
+  margin-top: 30px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.menu-item {
+  padding: 12px 0;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.menu-item:hover {
+  color: #ff4b4b;
+} 
