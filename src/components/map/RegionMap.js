@@ -8,13 +8,13 @@ import axios from "../../api/axiosInstance";
 
 // 커스텀 마커 아이콘 설정
 const customIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/2377/2377874.png", // 빨간색 마커 아이콘
-  iconSize: [35, 35],
-  iconAnchor: [17, 35],
-  popupAnchor: [0, -35],
+  iconUrl: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff4b4b'%3E%3Cpath d='M12 0C7.802 0 4 3.403 4 7.602C4 11.8 7.469 16.812 12 24C16.531 16.812 20 11.8 20 7.602C20 3.403 16.199 0 12 0ZM12 11C10.343 11 9 9.657 9 8C9 6.343 10.343 5 12 5C13.657 5 15 6.343 15 8C15 9.657 13.657 11 12 11Z'/%3E%3C/svg%3E",
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
 });
 
-const RegionMap = () => {
+const RegionMap = ({ mapType = "default" }) => {
   const [markers, setMarkers] = useState(dummyMarkers);
 
   useEffect(() => {
@@ -36,8 +36,8 @@ const RegionMap = () => {
     <MapContainer 
       center={[35.8, 127.5]} 
       zoom={7} 
-      style={{ width: "100%", height: "100%" }}
-      zoomControl={false} // 줌 컨트롤 위치 변경
+      style={{ width: "100%", height: "100%", background: "#f8f9fa" }}
+      zoomControl={false}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -51,7 +51,12 @@ const RegionMap = () => {
           icon={customIcon}
         >
           <Popup>
-            <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
+            <div style={{ 
+              padding: "8px", 
+              textAlign: "center",
+              fontWeight: "500",
+              fontSize: "14px"
+            }}>
               {marker.name}
             </div>
           </Popup>

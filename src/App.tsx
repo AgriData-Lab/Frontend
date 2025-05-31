@@ -2,11 +2,11 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
-import MapPage from './pages/MapPage.tsx';
-import DistributionMapPage from './pages/DistributionMapPage.tsx';
-import PriceMapPage from './pages/PriceMapPage.tsx';
+import MapPage from './pages/MapPage';
+import DistributionMapPage from './pages/DistributionMapPage';
+import PriceMapPage from './pages/PriceMapPage';
 
-function App() {
+const App = () => {
   return (
     <Router>
       <Routes>
@@ -18,6 +18,6 @@ function App() {
       </Routes>
     </Router>
   );
-}
+};
 
-export default App;
+export default App; 
