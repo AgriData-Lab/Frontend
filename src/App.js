@@ -5,6 +5,7 @@ import SignupPage from './pages/SignupPage';
 import MapPage from './pages/MapPage.tsx';
 import DistributionMapPage from './pages/DistributionMapPage.tsx';
 import PriceMapPage from './pages/PriceMapPage.tsx';
+import WholesalePricePage from './pages/Wholesale-price.tsx';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/map" element={<MapPage />} />
         <Route path="/map/distribution" element={<DistributionMapPage />} />
         <Route path="/map/price" element={<PriceMapPage />} />
+        <Route path="/wholesale-price" element={<WholesalePricePage />} />
       </Routes>
     </Router>
   );
