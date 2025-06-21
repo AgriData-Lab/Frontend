@@ -1,0 +1,138 @@
+.wholesale-page-container {
+  max-width: 430px;
+  margin: 0 auto;
+  background-color: #fffaf9;
+  min-height: 100vh;
+  font-family: sans-serif;
+  padding-bottom: 32px;
+}
+
+.wholesale-header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background-color: #fff6f6;
+}
+
+.hamburger-menu {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #555;
+  cursor: pointer;
+}
+
+.logo-container {
+  font-size: 28px;
+  margin: 0 auto;
+  background-color: #e8e0d9;
+  padding: 8px 16px;
+  border-radius: 12px;
+}
+
+.search-bar-container {
+  display: flex;
+  margin: 16px;
+  padding: 12px 16px;
+  border: 1.5px solid #a0a0a0;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.search-input {
+  flex-grow: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+}
+
+.search-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #6a82e3;
+  cursor: pointer;
+}
+
+.chart-container {
+  text-align: center;
+  padding: 0 16px;
+  margin-top: 24px;
+}
+
+.chart-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.chart-subtitle {
+  font-size: 14px;
+  color: #777;
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
+
+.chart-content {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.notification-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fdeeee;
+  margin: 24px 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: #555;
+  font-weight: 500;
+}
+
+.bell-icon {
+  font-size: 24px;
+  background-color: #e8e0d9;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+/* 차트 로딩 및 빈 상태 스타일 */
+.chart-content.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #666;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #F5BEBE;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.chart-content.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: #999;
+  font-style: italic;
+} 
