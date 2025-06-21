@@ -5,6 +5,7 @@ import SignupPage from './pages/SignupPage';
 import MapPage from './pages/MapPage';
 import DistributionMapPage from './pages/DistributionMapPage';
 import PriceMapPage from './pages/PriceMapPage';
+import WholesalePricePage from './pages/Wholesale-price';
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
         <Route path="/map" element={<MapPage />} />
         <Route path="/map/distribution" element={<DistributionMapPage />} />
         <Route path="/map/price" element={<PriceMapPage />} />
+        <Route path="/wholesale-price" element={<WholesalePricePage />} />
       </Routes>
     </Router>
   );
