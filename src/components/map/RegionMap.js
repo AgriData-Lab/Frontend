@@ -15,22 +15,72 @@ const customIcon = new L.Icon({
 });
 
 const RegionMap = ({ mapType = "default" }) => {
-  const [markers, setMarkers] = useState(dummyMarkers);
+  const [markers, setMarkers] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchMapData = async () => {
       try {
-        const response = await axios.get("/api/map");
+        setLoading(true);
+        
+        // localStorage에서 로그인 토큰 가져오기
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          console.error("로그인 토큰이 없습니다.");
+          setMarkers(dummyMarkers);
+          setLoading(false);
+          return;
+        }
+
+        // 백엔드 API 호출 - /api/items/filter 엔드포인트 사용
+        const response = await axios.get("/api/items/filter", {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
         if (response.data && response.data.length > 0) {
-          setMarkers(response.data);
+          // 백엔드에서 받은 데이터를 마커 형식으로 변환
+          const markerData = response.data.map((item, index) => ({
+            id: index,
+            name: `${item.city} - ${item.item}`,
+            lat: item.latitude,
+            lng: item.longitude,
+            city: item.city,
+            item: item.item
+          }));
+          setMarkers(markerData);
+        } else {
+          // 데이터가 없을 경우 더미 데이터 사용
+          setMarkers(dummyMarkers);
         }
       } catch (error) {
         console.error("Failed to fetch map data:", error);
+        // 에러 발생 시 더미 데이터 사용
+        setMarkers(dummyMarkers);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchMapData();
   }, []);
+
+  if (loading) {
+    return (
+      <div style={{ 
+        width: "100%", 
+        height: "100%", 
+        display: "flex", 
+        justifyContent: "center", 
+        alignItems: "center",
+        background: "#f8f9fa"
+      }}>
+        <div>지도 데이터를 불러오는 중...</div>
+      </div>
+    );
+  }
 
   return (
     <MapContainer 
@@ -57,7 +107,12 @@ const RegionMap = ({ mapType = "default" }) => {
               fontWeight: "500",
               fontSize: "14px"
             }}>
-              {marker.name}
+              <div style={{ marginBottom: "4px" }}>
+                <strong>{marker.city}</strong>
+              </div>
+              <div style={{ color: "#666" }}>
+                {marker.item}
+              </div>
             </div>
           </Popup>
         </Marker>
