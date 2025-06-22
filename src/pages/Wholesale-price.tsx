@@ -130,15 +130,15 @@ const WholesalePricePage = () => {
       <div className="search-bar-container">
        <input
         type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="검색어를 입력하세요 ex) 오이, 원예, 허브"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="검색어를 입력하세요 ex) 오이, 원예, 허브"
         className="search-input"
-      />
+          />
      <button onClick={handleSearch} className="search-button">
       🔍
      </button>
-</div>
+      </div>
 
       <PriceChart
         title={`전국 ${keyword} 출하시기`}

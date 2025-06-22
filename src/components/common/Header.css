@@ -52,7 +52,7 @@
 
 .menu-button.open span:nth-child(3) {
   transform: rotate(-45deg) translate(5px, -5px);
-}
+} 
 
 .header h1 {
   margin: 0 0 0 16px;
