@@ -243,9 +243,8 @@ const WholesalePricePage = () => {
         <div className="bell-icon">🔔</div>
       </div>
 
-      {/* 아래에 기존 빈 차트 복구 */}
       <PriceChart
-        title={`인접 지역 ${keyword} 가격 비교`}
+        title={`지역별 ${keyword} 도매가격 비교`}
         subtitle="현재, 1주전, 1개월전, 1년전 가격"
         data={regionChartData}
         loading={false}
