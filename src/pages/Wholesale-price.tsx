@@ -118,8 +118,6 @@ const WholesalePricePage = () => {
       setKeyword(input.trim());
     }
   };
-
-
   return (
     <div className="wholesale-page-container">
       <header className="wholesale-header">

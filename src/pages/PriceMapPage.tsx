@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import RegionMap from '../components/map/RegionMap';
+import BlockMap from '../components/map/BlockMap';
 import Sidebar from '../components/common/SideBar.tsx';
 import Header from '../components/common/Header.tsx';
 import './MapPage.css';
@@ -17,7 +17,7 @@ const PriceMapPage = () => {
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <main className="main-content">
         <div className="map-container">
-          <RegionMap mapType="price" />
+          <BlockMap />
         </div>
       </main>
     </div>
