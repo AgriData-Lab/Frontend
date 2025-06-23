@@ -21,45 +21,33 @@ ChartJS.register(
   Legend
 );
 
-interface ChartData {
-  date: string;
-  price: number;
-}
+type ChartDataType = {
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    borderColor: string;
+    backgroundColor: string;
+    fill: boolean;
+    tension: number;
+  }[];
+};
 
 interface PriceChartProps {
   title: string;
   subtitle: string;
-  data: ChartData[];
+  data: ChartDataType;
   loading: boolean;
 }
 
 const PriceChart = ({ title, subtitle, data, loading }: PriceChartProps) => {
-  const chartData = {
-    labels: data.map(item => item.date),
-    datasets: [
-      {
-        label: '도매가격 (원)',
-        data: data.map(item => item.price),
-        borderColor: '#F5BEBE',
-        backgroundColor: 'rgba(245, 190, 190, 0.1)',
-        borderWidth: 2,
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: '#F5BEBE',
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-      },
-    ],
-  };
-
   const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false,
+        display: true,
+        position: 'top' as const,
       },
       title: {
         display: false,
@@ -77,6 +65,7 @@ const PriceChart = ({ title, subtitle, data, loading }: PriceChartProps) => {
         },
       },
     },
+    interaction: { mode: 'nearest', axis: 'x', intersect: false },
     scales: {
       x: {
         grid: {
@@ -119,7 +108,7 @@ const PriceChart = ({ title, subtitle, data, loading }: PriceChartProps) => {
     );
   }
 
-  if (data.length === 0) {
+  if (!data || data.labels.length === 0) {
     return (
       <div className="chart-container">
         <h2 className="chart-title">{title}</h2>
@@ -137,7 +126,7 @@ const PriceChart = ({ title, subtitle, data, loading }: PriceChartProps) => {
       <p className="chart-subtitle">{subtitle}</p>
       <div className="chart-content">
         <div style={{ height: '300px', width: '100%' }}>
-          <Line data={chartData} options={options} />
+          <Line data={data} options={options} />
         </div>
       </div>
     </div>

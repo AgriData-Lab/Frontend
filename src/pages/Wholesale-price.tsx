@@ -27,12 +27,27 @@ interface ChartData {
   price: number;
 }
 
+type ChartDataType = {
+  labels: string[];
+  datasets: {
+    label: string;
+    data: number[];
+    borderColor: string;
+    backgroundColor: string;
+    fill: boolean;
+    tension: number;
+  }[];
+};
+
 const WholesalePricePage = () => {
-  const [keyword, setKeyword] = useState('사과'); // 기본 관심 품목 -> 추후 수정
+  const [keyword, setKeyword] = useState('사과');
   const [input, setInput] = useState('');
+  const [chartData, setChartData] = useState({ labels: [], datasets: [] } as ChartDataType);
+  const [loading, setLoading] = useState(false);
   const [nationalData, setNationalData] = useState([] as ChartData[]);
   const [localData, setLocalData] = useState([] as ChartData[]);
-  const [loading, setLoading] = useState(false);
+  const [regionApiData, setRegionApiData] = useState([] as any[]);
+  const [regionChartData, setRegionChartData] = useState({ labels: [], datasets: [] } as ChartDataType);
 
   // 현재 날짜 기준으로 날짜 계산
   const getDateRange = () => {
@@ -71,7 +86,7 @@ const WholesalePricePage = () => {
           {
             params: {
               itemName: keyword,
-              countryCode: '1101',
+              countryCode: '',
               startDate,
               endDate,
             },
@@ -83,24 +98,57 @@ const WholesalePricePage = () => {
 
         const items = response.data.result;
         if (!Array.isArray(items)) {
-          console.warn('⚠️ 예상과 다른 응답 구조:', response.data);
+          setChartData({ labels: [], datasets: [] });
           setNationalData([]);
           setLocalData([]);
           return;
         }
 
+        // 지역별로 그룹화
+        const grouped: { [county: string]: ChartData[] } = {};
+        items
+          .filter((item) => item.countyname !== '평년')
+          .forEach((item) => {
+            const date = `${item.yyyy}-${item.regday.replace('/', '-')}`;
+            const price = Number(item.price.replace(/,/g, ''));
+            if (!grouped[item.countyname]) grouped[item.countyname] = [];
+            grouped[item.countyname].push({ date, price });
+          });
+
+        // 모든 날짜(라벨) 추출 (서울 기준)
+        const counties = Object.keys(grouped);
+        const labels = grouped[counties[0]]?.map(item => item.date) || [];
+
+        // 색상 배열
+        const colors = [
+          'rgba(255,99,132,1)', 'rgba(54,162,235,1)', 'rgba(255,206,86,1)',
+          'rgba(75,192,192,1)', 'rgba(153,102,255,1)', 'rgba(255,159,64,1)'
+        ];
+
+        // datasets 생성
+        const datasets = counties.map((county, idx) => ({
+          label: county,
+          data: grouped[county].map(item => item.price),
+          borderColor: colors[idx % colors.length],
+          backgroundColor: colors[idx % colors.length],
+          fill: false,
+          tension: 0.1,
+        }));
+
+        setChartData({ labels, datasets });
+
+        // 기존 nationalData, localData도 복구
         const processedData = items
-          .filter((item) => item.countyname !== '평년') // 평년 제외
+          .filter((item) => item.countyname !== '평년')
           .map((item) => ({
             date: `${item.yyyy}-${item.regday.replace('/', '-')}`,
             price: Number(item.price.replace(/,/g, '')),
           }))
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
         setNationalData(processedData);
         setLocalData(processedData.filter((d) => d.price > 20000));
-      } catch (error) {
-        console.error('가격 데이터 조회 실패:', error);
+      } catch (error: any) {
+        setChartData({ labels: [], datasets: [] });
         setNationalData([]);
         setLocalData([]);
       } finally {
@@ -111,6 +159,51 @@ const WholesalePricePage = () => {
     if (keyword) {
       fetchPriceData();
     }
+  }, [keyword]);
+
+  // 아래 차트용 별도 useEffect
+  useEffect(() => {
+    const fetchRegionApiData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const { startDate } = getDateRange();
+        const response = await axios.get('/api/near-region/price/by-region', {
+          params: { itemName: keyword, countryCode: '', startDate },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const items = response.data.result;
+        console.log('[near-region/price/by-region 응답]', items);
+        setRegionApiData(items);
+
+        // 데이터 가공
+        const regionRows = items.filter(
+          (row: any) => !["평균", "최저값", "최고값", "등락률"].includes(row.countyName)
+        );
+        const labels = ["1년전", "1개월전", "1주전", "현재"];
+        const colors = [
+          'rgba(255,99,132,1)', 'rgba(54,162,235,1)', 'rgba(255,206,86,1)',
+          'rgba(75,192,192,1)', 'rgba(153,102,255,1)', 'rgba(255,159,64,1)'
+        ];
+        const datasets = regionRows.map((row: any, idx: number) => ({
+          label: row.countyName,
+          data: [
+            Number((row.yearprice || '0').replace(/,/g, "")),
+            Number((row.monthprice || '0').replace(/,/g, "")),
+            Number((row.weekprice || '0').replace(/,/g, "")),
+            Number((row.price || '0').replace(/,/g, "")),
+          ],
+          borderColor: colors[idx % colors.length],
+          backgroundColor: colors[idx % colors.length],
+          fill: false,
+          tension: 0.1,
+        }));
+        setRegionChartData({ labels, datasets });
+      } catch (e) {
+        setRegionChartData({ labels: [], datasets: [] });
+      }
+    };
+    fetchRegionApiData();
   }, [keyword]);
 
   const handleSearch = () => {
@@ -139,9 +232,9 @@ const WholesalePricePage = () => {
       </div>
 
       <PriceChart
-        title={`전국 ${keyword} 출하시기`}
-        subtitle="연도별 평균 도매가격"
-        data={nationalData}
+        title={`${keyword} 도매가격 지역별 비교`}
+        subtitle="날짜별 도매가격 (지역별 선그래프)"
+        data={chartData}
         loading={loading}
       />
 
@@ -151,10 +244,10 @@ const WholesalePricePage = () => {
       </div>
 
       <PriceChart
-        title={`인접 지역 ${keyword} 출하시기`}
-        subtitle="연도별 평균 도매가격 (단가 기준 필터링)"
-        data={localData}
-        loading={loading}
+        title={`지역별 ${keyword} 도매가격 비교`}
+        subtitle="현재, 1주전, 1개월전, 1년전 가격"
+        data={regionChartData}
+        loading={false}
       />
     </div>
   );
