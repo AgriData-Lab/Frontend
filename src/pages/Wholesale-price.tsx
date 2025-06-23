@@ -46,6 +46,8 @@ const WholesalePricePage = () => {
   const [loading, setLoading] = useState(false);
   const [nationalData, setNationalData] = useState([] as ChartData[]);
   const [localData, setLocalData] = useState([] as ChartData[]);
+  const [regionApiData, setRegionApiData] = useState([] as any[]);
+  const [regionChartData, setRegionChartData] = useState({ labels: [], datasets: [] } as ChartDataType);
 
   // 현재 날짜 기준으로 날짜 계산
   const getDateRange = () => {
@@ -159,6 +161,51 @@ const WholesalePricePage = () => {
     }
   }, [keyword]);
 
+  // 아래 차트용 별도 useEffect
+  useEffect(() => {
+    const fetchRegionApiData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const { startDate } = getDateRange();
+        const response = await axios.get('/api/near-region/price/by-region', {
+          params: { itemName: keyword, countryCode: '', startDate },
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const items = response.data.result;
+        console.log('[near-region/price/by-region 응답]', items);
+        setRegionApiData(items);
+
+        // 데이터 가공
+        const regionRows = items.filter(
+          (row: any) => !["평균", "최저값", "최고값", "등락률"].includes(row.countyName)
+        );
+        const labels = ["1년전", "1개월전", "1주전", "현재"];
+        const colors = [
+          'rgba(255,99,132,1)', 'rgba(54,162,235,1)', 'rgba(255,206,86,1)',
+          'rgba(75,192,192,1)', 'rgba(153,102,255,1)', 'rgba(255,159,64,1)'
+        ];
+        const datasets = regionRows.map((row: any, idx: number) => ({
+          label: row.countyName,
+          data: [
+            Number((row.yearprice || '0').replace(/,/g, "")),
+            Number((row.monthprice || '0').replace(/,/g, "")),
+            Number((row.weekprice || '0').replace(/,/g, "")),
+            Number((row.price || '0').replace(/,/g, "")),
+          ],
+          borderColor: colors[idx % colors.length],
+          backgroundColor: colors[idx % colors.length],
+          fill: false,
+          tension: 0.1,
+        }));
+        setRegionChartData({ labels, datasets });
+      } catch (e) {
+        setRegionChartData({ labels: [], datasets: [] });
+      }
+    };
+    fetchRegionApiData();
+  }, [keyword]);
+
   const handleSearch = () => {
     if (input.trim()) {
       setKeyword(input.trim());
@@ -198,9 +245,9 @@ const WholesalePricePage = () => {
 
       {/* 아래에 기존 빈 차트 복구 */}
       <PriceChart
-        title={`인접 지역 ${keyword} 출하시기`}
-        subtitle="연도별 평균 도매가격 (단가 기준 필터링)"
-        data={{ labels: [], datasets: [] }}
+        title={`인접 지역 ${keyword} 가격 비교`}
+        subtitle="현재, 1주전, 1개월전, 1년전 가격"
+        data={regionChartData}
         loading={false}
       />
     </div>
