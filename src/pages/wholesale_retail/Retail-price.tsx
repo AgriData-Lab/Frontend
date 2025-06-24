@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios, { AxiosResponse } from 'axios';
-import PriceChart from '../components/PriceChart.tsx';
+import PriceChart from '../../components/charts/PriceChart.tsx';
 import './Wholesale-price.css';
 
 // API 응답 데이터 타입 정의 (Retail - 소매)
