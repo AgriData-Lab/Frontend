@@ -33,8 +33,16 @@ type ChartDataType = {
   }[];
 };
 
+/*
 interface PriceChartProps {
   title: string;
+  subtitle: string;
+  data: ChartDataType;
+  loading: boolean;
+}
+*/
+interface PriceChartProps {
+  title: React.ReactNode;
   subtitle: string;
   data: ChartDataType;
   loading: boolean;

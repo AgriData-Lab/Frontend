@@ -22,7 +22,7 @@ function SignupForm() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     name: "",
-    id: "",
+    email: "",
     password: "",
     passwordCheck: "",
     region: "",

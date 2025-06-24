@@ -13,7 +13,7 @@ function SignupStep1({ form, onNext }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!localForm.name || !localForm.id || !localForm.password || !localForm.passwordCheck) {
+    if (!localForm.name || !localForm.email || !localForm.password || !localForm.passwordCheck) {
       alert("모든 필드를 입력하세요.");
       return;
     }
@@ -103,9 +103,9 @@ function SignupStep1({ form, onNext }) {
           <label style={{ fontWeight: "bold" }}>아이디</label>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <input
-              name="id"
+              name="email"
               placeholder="사용할 이메일을 입력해 주세요."
-              value={localForm.id}
+              value={localForm.email}
               onChange={handleChange}
               style={{
                 flex: 1,
