@@ -41,7 +41,7 @@ type ChartDataType = {
 
 const WholesalePricePage = () => {
   const [keyword, setKeyword] = useState('사과');
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState('사과');
   const [chartData, setChartData] = useState({ labels: [], datasets: [] } as ChartDataType);
   const [loading, setLoading] = useState(false);
   const [nationalData, setNationalData] = useState([]);
@@ -93,6 +93,35 @@ const WholesalePricePage = () => {
         setItemList(names);
       });
   }, []);
+
+  // 관심품목을 백엔드에서 받아와서 기본값으로 사용
+  useEffect(() => {
+    const fetchInterestItem = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const res = await axios.get('/users/prefer-item', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const interest = res.data?.result;
+        if (interest) {
+          setKeyword(interest);
+          setInput(interest);
+        }
+      } catch (e) {
+        // 에러 시 무시하고 기본값(사과) 사용
+      }
+    };
+    fetchInterestItem();
+  }, []);
+
+  // itemList가 로드된 후에도 관심품목이 목록에 없으면 fallback 처리
+  useEffect(() => {
+    if (itemList.length > 0 && !itemList.includes(keyword)) {
+      setKeyword('사과');
+      setInput('사과');
+    }
+  }, [itemList, keyword]);
 
   // 날짜를 yyyy-MM-dd -> yyyyMMdd로 변환하는 함수
   function formatDateToYYYYMMDD(dateStr: string) {
