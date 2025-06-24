@@ -31,7 +31,7 @@ type ChartDataType = {
   labels: string[];
   datasets: {
     label: string;
-    data: number[];
+    data: (number | null)[];
     borderColor: string;
     backgroundColor: string;
     fill: boolean;
@@ -40,17 +40,17 @@ type ChartDataType = {
 };
 
 const WholesalePricePage = () => {
-  const [keyword, setKeyword] = useState('사과');
-  const [input, setInput] = useState('사과');
+  const [keyword, setKeyword] = useState<string>('사과'); // 타입 확실히 지정
+  const [input, setInput] = useState<string>('사과'); // 타입 확실히 지정
   const [chartData, setChartData] = useState({ labels: [], datasets: [] } as ChartDataType);
   const [loading, setLoading] = useState(false);
-  const [nationalData, setNationalData] = useState([]);
-  const [localData, setLocalData] = useState([]);
+  const [nationalData, setNationalData] = useState<ChartData[]>([]); // 제네릭 타입 지정
+  const [localData, setLocalData] = useState<ChartData[]>([]); // 타입 지정
   const [regionApiData, setRegionApiData] = useState([]);
   const [regionChartData, setRegionChartData] = useState({ labels: [], datasets: [] } as ChartDataType);
   const [startDate, setStartDate] = useState(getDefaultStartDate());
   const [endDate, setEndDate] = useState(getDefaultEndDate());
-  const [itemList, setItemList] = useState([]);
+  const [itemList, setItemList] = useState<string[]>([]); // 제네릭 타입 지정
 
   // 기본 날짜 유틸 함수 추가
   function getDefaultStartDate() {
