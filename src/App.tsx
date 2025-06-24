@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import MapPage from './pages/MapPage';
-import DistributionMapPage from './pages/DistributionMapPage';
-import PriceMapPage from './pages/PriceMapPage';
-import WholesalePricePage from './pages/Wholesale-price';
-import RetailPricePage from './pages/Retail-price';
+import LoginPage from './pages/login/LoginPage';
+import SignupPage from './pages/login/SignupPage';
+import MapPage from './pages/map/MapPage';
+import DistributionMapPage from './pages/map/DistributionMapPage';
+import PriceMapPage from './pages/map/PriceMapPage';
+import WholesalePricePage from './pages/wholesale_retail/Wholesale-price';
+import RetailPricePage from './pages/wholesale_retail/Retail-price';
 
 const App = () => {
   return (

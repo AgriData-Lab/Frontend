@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import SignupStep1 from "./SignupStep1";
-import SignupStep2 from "./SignupStep2";
-import axios from "../api/axiosInstance";
+import SignupStep1 from "../SignupStep1";
+import SignupStep2 from "../SignupStep2";
+import axios from "../../api/axiosInstance";
 
 const containerStyle = {
   width: "100%",
