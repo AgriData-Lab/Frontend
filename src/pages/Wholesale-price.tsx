@@ -44,10 +44,23 @@ const WholesalePricePage = () => {
   const [input, setInput] = useState('');
   const [chartData, setChartData] = useState({ labels: [], datasets: [] } as ChartDataType);
   const [loading, setLoading] = useState(false);
-  const [nationalData, setNationalData] = useState([] as ChartData[]);
-  const [localData, setLocalData] = useState([] as ChartData[]);
-  const [regionApiData, setRegionApiData] = useState([] as any[]);
+  const [nationalData, setNationalData] = useState([]);
+  const [localData, setLocalData] = useState([]);
+  const [regionApiData, setRegionApiData] = useState([]);
   const [regionChartData, setRegionChartData] = useState({ labels: [], datasets: [] } as ChartDataType);
+  const [startDate, setStartDate] = useState(getDefaultStartDate());
+  const [endDate, setEndDate] = useState(getDefaultEndDate());
+  const [itemList, setItemList] = useState([]);
+
+  // 기본 날짜 유틸 함수 추가
+  function getDefaultStartDate() {
+    const d = new Date();
+    d.setDate(d.getDate() - 9);
+    return d.toISOString().slice(0, 10);
+  }
+  function getDefaultEndDate() {
+    return new Date().toISOString().slice(0, 10);
+  }
 
   // 현재 날짜 기준으로 날짜 계산
   const getDateRange = () => {
@@ -68,6 +81,24 @@ const WholesalePricePage = () => {
     };
   };
 
+  // CSV에서 itemName만 추출 (최초 1회, fetch 사용)
+  useEffect(() => {
+    fetch('/items.csv')
+      .then(res => res.text())
+      .then(text => {
+        const lines = text.split('\n').slice(1); // 첫 줄은 헤더
+        const names = lines
+          .map(line => line.split(',')[2])
+          .filter(Boolean);
+        setItemList(names);
+      });
+  }, []);
+
+  // 날짜를 yyyy-MM-dd -> yyyyMMdd로 변환하는 함수
+  function formatDateToYYYYMMDD(dateStr: string) {
+    return dateStr.replace(/-/g, '');
+  }
+
   useEffect(() => {
     const fetchPriceData = async () => {
       setLoading(true);
@@ -79,16 +110,14 @@ const WholesalePricePage = () => {
           return;
         }
 
-        const { startDate, endDate } = getDateRange();
-
         const response: AxiosResponse<ApiResponse<ShippingData[]>> = await axios.get(
           `/api/shipping-periods`,
           {
             params: {
               itemName: keyword,
               countryCode: '',
-              startDate,
-              endDate,
+              startDate: formatDateToYYYYMMDD(startDate),
+              endDate: formatDateToYYYYMMDD(endDate),
             },
             headers: {
               Authorization: `Bearer ${token}`,
@@ -159,7 +188,7 @@ const WholesalePricePage = () => {
     if (keyword) {
       fetchPriceData();
     }
-  }, [keyword]);
+  }, [keyword, startDate, endDate]);
 
   // 아래 차트용 별도 useEffect
   useEffect(() => {
@@ -167,9 +196,8 @@ const WholesalePricePage = () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) return;
-        const { startDate } = getDateRange();
         const response = await axios.get('/api/near-region/price/by-region', {
-          params: { itemName: keyword, countryCode: '', startDate },
+          params: { itemName: keyword, countryCode: '', startDate: formatDateToYYYYMMDD(startDate) },
           headers: { Authorization: `Bearer ${token}` },
         });
         const items = response.data.result;
@@ -204,7 +232,7 @@ const WholesalePricePage = () => {
       }
     };
     fetchRegionApiData();
-  }, [keyword]);
+  }, [keyword, startDate]);
 
   const handleSearch = () => {
     if (input.trim()) {
@@ -218,17 +246,39 @@ const WholesalePricePage = () => {
         <div className="logo-container">🌱</div>
       </header>
 
-      <div className="search-bar-container">
-       <input
-        type="text"
+      <div className="search-bar-container" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <select
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="검색어를 입력하세요 ex) 오이, 원예, 허브"
-        className="search-input"
+            onChange={e => setInput(e.target.value)}
+            className="search-input"
+            style={{ width: '100%' }}
+          >
+            <option value="">품목을 선택하세요</option>
+            {itemList.map((name) => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <input
+            type="date"
+            value={startDate}
+            onChange={e => setStartDate(e.target.value)}
+            className="date-input"
+            style={{ flex: 1, minWidth: 110, maxWidth: 140 }}
           />
-     <button onClick={handleSearch} className="search-button">
-      🔍
-     </button>
+          <input
+            type="date"
+            value={endDate}
+            onChange={e => setEndDate(e.target.value)}
+            className="date-input"
+            style={{ flex: 1, minWidth: 110, maxWidth: 140 }}
+          />
+          <button onClick={handleSearch} className="search-button" style={{ minWidth: 44, fontSize: 22 }}>
+            🔍
+          </button>
+        </div>
       </div>
 
       <PriceChart
