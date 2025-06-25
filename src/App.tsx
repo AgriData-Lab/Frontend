@@ -7,6 +7,7 @@ import DistributionMapPage from './pages/map/DistributionMapPage';
 import PriceMapPage from './pages/map/PriceMapPage';
 import WholesalePricePage from './pages/wholesale_retail/Wholesale-price';
 import RetailPricePage from './pages/wholesale_retail/Retail-price';
+import FacilityMapPage from './pages/map/FacilityMapPage';
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         <Route path="/map/price" element={<PriceMapPage />} />
         <Route path="/wholesale-price" element={<WholesalePricePage />} />
         <Route path="/retail-price" element={<RetailPricePage />} />
+        <Route path="/map/facility" element={<FacilityMapPage />} />
       </Routes>
     </Router>
   );
