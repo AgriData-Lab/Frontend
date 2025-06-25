@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import BlockMap from '../../components/map/BlockMap.js';
 import Sidebar from '../../components/common/SideBar.tsx';
 import Header from '../../components/common/Header.tsx';
-import './MapPage.css';
 
 const PriceMapPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
