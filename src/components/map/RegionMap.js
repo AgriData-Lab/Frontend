@@ -1,7 +1,6 @@
 // components/map/RegionMap.tsx
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { dummyMarkers } from "../../data/dummyMarkers.ts";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import axios from "../../api/axiosInstance";
@@ -28,7 +27,6 @@ const RegionMap = ({ mapType = "default" }) => {
         
         if (!token) {
           console.error("로그인 토큰이 없습니다.");
-          setMarkers(dummyMarkers);
           setLoading(false);
           return;
         }
@@ -52,13 +50,10 @@ const RegionMap = ({ mapType = "default" }) => {
           }));
           setMarkers(markerData);
         } else {
-          // 데이터가 없을 경우 더미 데이터 사용
-          setMarkers(dummyMarkers);
+          
         }
       } catch (error) {
         console.error("Failed to fetch map data:", error);
-        // 에러 발생 시 더미 데이터 사용
-        setMarkers(dummyMarkers);
       } finally {
         setLoading(false);
       }
