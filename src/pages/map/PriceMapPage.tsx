@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import RegionMap from '../components/map/RegionMap';
-import Sidebar from '../components/common/SideBar.tsx';
-import Header from '../components/common/Header.tsx';
+import BlockMap from '../../components/map/BlockMap.js';
+import Sidebar from '../../components/common/SideBar.tsx';
+import Header from '../../components/common/Header.tsx';
 import './MapPage.css';
 
-const MapPage = () => {
+const PriceMapPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -17,11 +17,11 @@ const MapPage = () => {
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       <main className="main-content">
         <div className="map-container">
-          <RegionMap mapType="default" />
+          <BlockMap />
         </div>
       </main>
     </div>
   );
 };
 
-export default MapPage; 
+export default PriceMapPage; 

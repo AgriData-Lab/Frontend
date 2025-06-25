@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios, { AxiosResponse } from 'axios';
-import PriceChart from '../components/PriceChart.tsx';
-import './Wholesale-price.css';
 
+import PriceChart from '../../components/charts/PriceChart.tsx';
+import './Wholesale-price.css';
 // API 응답 데이터 타입 정의
 interface ShippingData {
   itemname: string;
@@ -44,13 +44,13 @@ const WholesalePricePage = () => {
   const [input, setInput] = useState('사과');
   const [chartData, setChartData] = useState({ labels: [], datasets: [] } as ChartDataType);
   const [loading, setLoading] = useState(false);
-  const [nationalData, setNationalData] = useState([]);
-  const [localData, setLocalData] = useState([]);
+  const [nationalData, setNationalData] = useState<{ date: string; price: number }[]>([]);
+  const [localData, setLocalData] = useState<{ date: string; price: number }[]>([]);
   const [regionApiData, setRegionApiData] = useState([]);
   const [regionChartData, setRegionChartData] = useState({ labels: [], datasets: [] } as ChartDataType);
   const [startDate, setStartDate] = useState(getDefaultStartDate());
   const [endDate, setEndDate] = useState(getDefaultEndDate());
-  const [itemList, setItemList] = useState([]);
+  const [itemList, setItemList] = useState<string[]>([]);
   const [notificationPrice, setNotificationPrice] = useState<number | null>(null);
   const [notificationLoading, setNotificationLoading] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState('');
@@ -552,5 +552,4 @@ const WholesalePricePage = () => {
     </div>
   );
 };
-
 export default WholesalePricePage;

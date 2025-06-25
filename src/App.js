@@ -1,11 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import MapPage from './pages/MapPage.tsx';
-import DistributionMapPage from './pages/DistributionMapPage.tsx';
-import PriceMapPage from './pages/PriceMapPage.tsx';
-import WholesalePricePage from './pages/Wholesale-price.tsx';
+import LoginPage from './pages/login/LoginPage.js';
+import SignupPage from './pages/login/SignupPage.js';
+import MapPage from './pages/map/MapPage.tsx';
+import DistributionMapPage from './pages/map/DistributionMapPage.tsx';
+import PriceMapPage from './pages/map/PriceMapPage.tsx';
+import WholesalePricePage from './pages/wholesale_retail/Wholesale-price.tsx';
+import RetailPricePage from './pages/wholesale_retail/Retail-price.tsx';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/map/distribution" element={<DistributionMapPage />} />
         <Route path="/map/price" element={<PriceMapPage />} />
         <Route path="/wholesale-price" element={<WholesalePricePage />} />
+        <Route path="/retail-price" element={<RetailPricePage />} />
       </Routes>
     </Router>
   );
