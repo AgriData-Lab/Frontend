@@ -1,17 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import axios from "../../api/axiosInstance";
-
-// 커스텀 마커 아이콘
-const customIcon = new L.Icon({
-  iconUrl:
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ff4b4b'%3E%3Cpath d='M12 0C7.802 0 4 3.403 4 7.602C4 11.8 7.469 16.812 12 24C16.531 16.812 20 11.8 20 7.602C20 3.403 16.199 0 12 0ZM12 11C10.343 11 9 9.657 9 8C9 6.343 10.343 5 12 5C13.657 5 15 6.343 15 8C15 9.657 13.657 11 12 11Z'/%3E%3C/svg%3E",
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32],
-});
 
 // 시군별 위경도 매핑 (예시, 실제 데이터 더 추가 가능)
 const regionCoords = {
@@ -20,7 +11,6 @@ const regionCoords = {
   "대구": { lat: 35.798838, lng: 128.583052 },
   "광주": { lat: 35.1, lng: 126.8 },
   "대전": { lat: 36.3504119, lng: 127.3845475 },
-  // ...추가 시군
 };
 
 export default function BlockMap() {
@@ -50,7 +40,7 @@ export default function BlockMap() {
               name: item.countyname,
               lat: coords.lat,
               lng: coords.lng,
-              price: item.price,
+              price: Number(String(item.price).replace(/[^\d]/g, "")),
             };
           });
         setMarkers(markerData);
@@ -64,8 +54,12 @@ export default function BlockMap() {
   }, []);
 
   if (loading) {
-    return <div style={{ width: "100%", height: "400px", display: "flex", alignItems: "center", justifyContent: "center" }}>지도를 불러오는 중...</div>;
+    return <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>지도를 불러오는 중...</div>;
   }
+
+  // 가격 그라데이션: minPrice~maxPrice → 연분홍~진분홍
+  const minPrice = Math.min(...markers.map(m => m.price));
+  const maxPrice = Math.max(...markers.map(m => m.price));
 
   return (
     <MapContainer
@@ -78,21 +72,49 @@ export default function BlockMap() {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      {markers.map(region => (
-        <Marker
-          key={region.name}
-          position={[region.lat, region.lng]}
-          icon={customIcon}
-        >
-          <Popup>
-            <div style={{ textAlign: "center" }}>
-              <b>{region.name}</b>
-              <br />
-              시세: {region.price.toLocaleString()}원
+      {markers.map(region => {
+        const ratio = (region.price - minPrice) / (maxPrice - minPrice || 1); // 0~1
+        // 연분홍(255,220,235) ~ 진분홍(229,115,181)로 보간
+        const r = Math.round(255 + (229 - 255) * ratio);
+        const g = Math.round(220 + (115 - 220) * ratio);
+        const b = Math.round(235 + (181 - 235) * ratio);
+        const bg = `rgb(${r},${g},${b})`;
+        const border = "2px solid #fff";
+        const color = "#fff";
+        const fontSize = ratio > 0.95 ? "1.35rem" : "1.1rem";
+        const icon = L.divIcon({
+          className: "custom-label",
+          html: `
+            <div style="
+              font-weight:bold;
+              color:${color};
+              font-size:${fontSize};
+              background:${bg};
+              padding:6px 16px 4px 16px;
+              border-radius:14px;
+              border:${border};
+              box-shadow:0 2px 8px rgba(229,115,181,0.15);
+              text-align:center;
+              line-height:1.3;
+              letter-spacing:-0.5px;
+              font-family:inherit;
+              ">
+              <div style="font-size:1.05em;font-weight:bold;">${region.name}</div>
+              <div style="font-size:0.98em;">${region.price.toLocaleString()}원</div>
             </div>
-          </Popup>
-        </Marker>
-      ))}
+          `,
+          iconSize: [110, 54],
+          iconAnchor: [55, 27],
+        });
+        return (
+          <Marker
+            key={region.name}
+            position={[region.lat, region.lng]}
+            icon={icon}
+            interactive={false}
+          />
+        );
+      })}
     </MapContainer>
   );
 }
