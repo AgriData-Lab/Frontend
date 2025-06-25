@@ -3,6 +3,8 @@ import axios, { AxiosResponse } from 'axios';
 
 import PriceChart from '../../components/charts/PriceChart.tsx';
 import './Wholesale-price.css';
+import Sidebar from '../../components/common/SideBar.tsx';
+
 // API 응답 데이터 타입 정의
 interface ShippingData {
   itemname: string;
@@ -65,6 +67,8 @@ const WholesalePricePage = () => {
     return sessionStorage.getItem('hasShownTodayPopup') === getTodayStr();
   });
   const [hasCheckedTodayNotice, setHasCheckedTodayNotice] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
 
   // 기본 날짜 유틸 함수 추가
   function getDefaultStartDate() {
@@ -389,9 +393,9 @@ const WholesalePricePage = () => {
   };
 
   return (
-    <div className="wholesale-page-container">
+    <div className="mobile-container">
       <header className="wholesale-header">
-        <button className="hamburger-menu">☰</button>
+        <button className="hamburger-menu" onClick={toggleSidebar}>☰</button>
         <div className="logo-container" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span role="img" aria-label="logo">🌱</span>
           <button
@@ -549,6 +553,7 @@ const WholesalePricePage = () => {
           </div>
         </div>
       )}
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
     </div>
   );
 };
