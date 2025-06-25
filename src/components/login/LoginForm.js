@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "../api/axiosInstance";
+import axios from '../../api/axiosInstance';
 import { Link } from "react-router-dom";
 
 // 눈 아이콘 SVG

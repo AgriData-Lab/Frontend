@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios, { AxiosResponse } from 'axios';
+
 import PriceChart from '../../components/charts/PriceChart.tsx';
 import './Wholesale-price.css';
-
 // API 응답 데이터 타입 정의
 interface ShippingData {
   itemname: string;
@@ -31,7 +31,7 @@ type ChartDataType = {
   labels: string[];
   datasets: {
     label: string;
-    data: (number | null)[];
+    data: number[];
     borderColor: string;
     backgroundColor: string;
     fill: boolean;
@@ -40,17 +40,31 @@ type ChartDataType = {
 };
 
 const WholesalePricePage = () => {
-  const [keyword, setKeyword] = useState<string>('사과'); // 타입 확실히 지정
-  const [input, setInput] = useState<string>('사과'); // 타입 확실히 지정
+  const [keyword, setKeyword] = useState('사과');
+  const [input, setInput] = useState('사과');
   const [chartData, setChartData] = useState({ labels: [], datasets: [] } as ChartDataType);
   const [loading, setLoading] = useState(false);
-  const [nationalData, setNationalData] = useState<ChartData[]>([]); // 제네릭 타입 지정
-  const [localData, setLocalData] = useState<ChartData[]>([]); // 타입 지정
+  const [nationalData, setNationalData] = useState<{ date: string; price: number }[]>([]);
+  const [localData, setLocalData] = useState<{ date: string; price: number }[]>([]);
   const [regionApiData, setRegionApiData] = useState([]);
   const [regionChartData, setRegionChartData] = useState({ labels: [], datasets: [] } as ChartDataType);
   const [startDate, setStartDate] = useState(getDefaultStartDate());
   const [endDate, setEndDate] = useState(getDefaultEndDate());
-  const [itemList, setItemList] = useState<string[]>([]); // 제네릭 타입 지정
+  const [itemList, setItemList] = useState<string[]>([]);
+  const [notificationPrice, setNotificationPrice] = useState<number | null>(null);
+  const [notificationLoading, setNotificationLoading] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState('');
+  const [notificationMsgType, setNotificationMsgType] = useState<'success' | 'error'>('success');
+  const [showToast, setShowToast] = useState(false);
+  const [shownNotificationIds, setShownNotificationIds] = useState<string[]>([]);
+  const [pendingNotices, setPendingNotices] = useState<string[]>([]);
+  const [allTodayNotices, setAllTodayNotices] = useState<any[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [hasShownTodayPopup, setHasShownTodayPopup] = useState(() => {
+    // sessionStorage에 기록이 있으면 true, 없으면 false
+    return sessionStorage.getItem('hasShownTodayPopup') === getTodayStr();
+  });
+  const [hasCheckedTodayNotice, setHasCheckedTodayNotice] = useState(false);
 
   // 기본 날짜 유틸 함수 추가
   function getDefaultStartDate() {
@@ -268,11 +282,129 @@ const WholesalePricePage = () => {
       setKeyword(input.trim());
     }
   };
+
+  // 알림 등록 함수
+  const handleRegisterNotification = async () => {
+    if (!notificationPrice || notificationPrice <= 0) {
+      setNotificationMsg('유효한 가격을 입력하세요.');
+      setNotificationMsgType('error');
+      setShowToast(true);
+      return;
+    }
+    setNotificationLoading(true);
+    setNotificationMsg('');
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setNotificationMsg('로그인이 필요합니다.');
+        setNotificationMsgType('error');
+        setShowToast(true);
+        setNotificationLoading(false);
+        return;
+      }
+      await axios.post('/api/notifications/notifications', {
+        itemName: keyword,
+        targetPrice: notificationPrice,
+        type: '도매',
+        isActive: true,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotificationMsg('알림이 등록되었습니다!');
+      setNotificationMsgType('success');
+      setNotificationPrice(null);
+      setShowToast(true);
+    } catch (e: any) {
+      setNotificationMsg('알림 등록 실패');
+      setNotificationMsgType('error');
+      setShowToast(true);
+    } finally {
+      setNotificationLoading(false);
+    }
+  };
+
+  // 토스트 자동 닫기
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => setShowToast(false), 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
+
+  // 오늘 날짜 yyyy-MM-dd
+  function getTodayStr() {
+    const d = new Date();
+    return d.toISOString().slice(0, 10);
+  }
+
+  // 페이지 진입 시 오늘 알림 조회 (최초 1회만)
+  useEffect(() => {
+    const fetchTodayNotifications = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      try {
+        const res = await axios.get('/api/notifications', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const result = res.data?.result || [];
+        // 오늘 날짜에 해당하는 알림만 필터
+        const today = getTodayStr();
+        const todayNotices = result.filter((n: any) => n.triggeredAt?.startsWith(today));
+        setAllTodayNotices(todayNotices);
+        // 이미 보여준 알림은 제외
+        const newNotices = todayNotices.filter((n: any) => !shownNotificationIds.includes(`${n.notificationId}_${n.triggeredAt}`));
+        if (newNotices.length > 0 && !hasShownTodayPopup) {
+          setPendingNotices(newNotices.map((n: any) => n.message));
+          setShownNotificationIds(ids => [...ids, ...newNotices.map((n: any) => `${n.notificationId}_${n.triggeredAt}`)]);
+          setHasShownTodayPopup(true);
+          sessionStorage.setItem('hasShownTodayPopup', today); // 오늘 날짜로 기록
+        }
+      } catch (e) {
+        // 무시
+      }
+    };
+    fetchTodayNotifications();
+    // eslint-disable-next-line
+  }, []);
+
+  // pendingNotices가 있으면 순차 팝업 (최초 진입 1회만)
+  useEffect(() => {
+    if (pendingNotices.length > 0) {
+      setNotificationMsg(pendingNotices[0]);
+      setNotificationMsgType('success');
+      setShowToast(true);
+      const timer = setTimeout(() => {
+        setShowToast(false);
+        setPendingNotices(notices => notices.slice(1));
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [pendingNotices]);
+
+  // 알림 아이콘 클릭 시
+  const handleOpenModal = () => {
+    setShowModal(true);
+    setHasCheckedTodayNotice(true);
+    sessionStorage.setItem('hasShownTodayPopup', getTodayStr()); // 종 아이콘 뱃지도 동일하게 관리
+  };
+
   return (
     <div className="wholesale-page-container">
       <header className="wholesale-header">
         <button className="hamburger-menu">☰</button>
-        <div className="logo-container">🌱</div>
+        <div className="logo-container" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span role="img" aria-label="logo">🌱</span>
+          <button
+            onClick={handleOpenModal}
+            style={{ background: 'none', border: 'none', marginLeft: 8, cursor: 'pointer', position: 'relative' }}
+            aria-label="알림"
+          >
+            <span style={{ fontSize: 24 }}>🔔</span>
+            {allTodayNotices.length > 0 && !hasCheckedTodayNotice && sessionStorage.getItem('hasShownTodayPopup') !== getTodayStr() && (
+              <span style={{ position: 'absolute', top: 2, right: 2, background: '#ff4b4b', color: '#fff', borderRadius: '50%', fontSize: 11, width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{allTodayNotices.length}</span>
+            )}
+          </button>
+        </div>
       </header>
 
       <div className="search-bar-container" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -319,8 +451,46 @@ const WholesalePricePage = () => {
 
       <div className="notification-bar">
         <span>원하는 시세(원)</span>
+        <input
+          type="number"
+          min="0"
+          placeholder="가격 입력"
+          value={notificationPrice || ''}
+          onChange={e => setNotificationPrice(Number(e.target.value))}
+          className="notification-input"
+          style={{ width: 100, marginLeft: 8, marginRight: 8 }}
+        />
+        <button
+          className="notification-register-btn"
+          style={{ fontSize: 16, padding: '2px 10px', marginRight: 8 }}
+          onClick={handleRegisterNotification}
+          disabled={!notificationPrice || notificationLoading}
+        >
+          {notificationLoading ? '등록중...' : '등록'}
+        </button>
         <div className="bell-icon">🔔</div>
       </div>
+
+      {showToast && (
+        <div style={{
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          background: 'rgba(0,0,0,0.85)',
+          color: '#fff',
+          padding: '18px 32px',
+          borderRadius: 16,
+          fontSize: 17,
+          zIndex: 9999,
+          minWidth: 180,
+          textAlign: 'center',
+          boxShadow: '0 2px 12px #0003',
+          fontWeight: 500,
+        }}>
+          {notificationMsg}
+        </div>
+      )}
 
       <PriceChart
         title={`지역별 ${keyword} 도매가격 비교`}
@@ -328,8 +498,58 @@ const WholesalePricePage = () => {
         data={regionChartData}
         loading={false}
       />
+
+      {showModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.25)',
+          zIndex: 10000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            style={{
+              background: '#fff',
+              borderRadius: 18,
+              padding: '28px 20px 20px 20px',
+              minWidth: 260,
+              maxWidth: 340,
+              boxShadow: '0 2px 16px #0002',
+              position: 'relative',
+              textAlign: 'center',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 12 }}>오늘의 알림</div>
+            {allTodayNotices.length === 0 ? (
+              <div style={{ color: '#888', fontSize: 15, padding: '24px 0' }}>오늘 알림 없음</div>
+            ) : (
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, maxHeight: 260, overflowY: 'auto' }}>
+                {allTodayNotices.map((n, i) => (
+                  <li key={n.notificationId + '_' + n.triggeredAt} style={{ marginBottom: 16, textAlign: 'left', fontSize: 15, color: '#333', background: '#f8f6f5', borderRadius: 10, padding: '10px 12px' }}>
+                    <div style={{ fontWeight: 500 }}>
+                      {n.itemName ? `[${n.itemName}] ` : ''}{n.message}
+                    </div>
+                    <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>{n.triggeredAt}</div>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <button
+              onClick={() => setShowModal(false)}
+              style={{ marginTop: 18, background: '#ff4b4b', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 24px', fontWeight: 600, fontSize: 15, cursor: 'pointer' }}
+            >닫기</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
 export default WholesalePricePage;

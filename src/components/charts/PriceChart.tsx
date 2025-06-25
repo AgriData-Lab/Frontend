@@ -10,6 +10,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import type { ChartOptions } from 'chart.js';
 
 ChartJS.register(
   CategoryScale,
@@ -25,7 +26,7 @@ type ChartDataType = {
   labels: string[];
   datasets: {
     label: string;
-    data: (number | null)[];
+    data: number[];
     borderColor: string;
     backgroundColor: string;
     fill: boolean;
@@ -33,23 +34,15 @@ type ChartDataType = {
   }[];
 };
 
-/*
 interface PriceChartProps {
   title: string;
   subtitle: string;
   data: ChartDataType;
   loading: boolean;
 }
-*/
-interface PriceChartProps {
-  title: React.ReactNode;
-  subtitle: string;
-  data: ChartDataType;
-  loading: boolean;
-}
 
 const PriceChart = ({ title, subtitle, data, loading }: PriceChartProps) => {
-  const options = {
+  const options: ChartOptions<'line'> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
