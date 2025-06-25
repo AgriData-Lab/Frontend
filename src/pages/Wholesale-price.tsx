@@ -534,7 +534,9 @@ const WholesalePricePage = () => {
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, maxHeight: 260, overflowY: 'auto' }}>
                 {allTodayNotices.map((n, i) => (
                   <li key={n.notificationId + '_' + n.triggeredAt} style={{ marginBottom: 16, textAlign: 'left', fontSize: 15, color: '#333', background: '#f8f6f5', borderRadius: 10, padding: '10px 12px' }}>
-                    <div style={{ fontWeight: 500 }}>{n.message}</div>
+                    <div style={{ fontWeight: 500 }}>
+                      {n.itemName ? `[${n.itemName}] ` : ''}{n.message}
+                    </div>
                     <div style={{ fontSize: 12, color: '#888', marginTop: 4 }}>{n.triggeredAt}</div>
                   </li>
                 ))}
