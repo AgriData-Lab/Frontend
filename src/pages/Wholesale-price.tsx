@@ -60,7 +60,10 @@ const WholesalePricePage = () => {
   const [pendingNotices, setPendingNotices] = useState<string[]>([]);
   const [allTodayNotices, setAllTodayNotices] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const [hasShownTodayPopup, setHasShownTodayPopup] = useState(false);
+  const [hasShownTodayPopup, setHasShownTodayPopup] = useState(() => {
+    // sessionStorage에 기록이 있으면 true, 없으면 false
+    return sessionStorage.getItem('hasShownTodayPopup') === getTodayStr();
+  });
   const [hasCheckedTodayNotice, setHasCheckedTodayNotice] = useState(false);
 
   // 기본 날짜 유틸 함수 추가
@@ -354,6 +357,7 @@ const WholesalePricePage = () => {
           setPendingNotices(newNotices.map((n: any) => n.message));
           setShownNotificationIds(ids => [...ids, ...newNotices.map((n: any) => `${n.notificationId}_${n.triggeredAt}`)]);
           setHasShownTodayPopup(true);
+          sessionStorage.setItem('hasShownTodayPopup', today); // 오늘 날짜로 기록
         }
       } catch (e) {
         // 무시
@@ -381,6 +385,7 @@ const WholesalePricePage = () => {
   const handleOpenModal = () => {
     setShowModal(true);
     setHasCheckedTodayNotice(true);
+    sessionStorage.setItem('hasShownTodayPopup', getTodayStr()); // 종 아이콘 뱃지도 동일하게 관리
   };
 
   return (
@@ -395,7 +400,7 @@ const WholesalePricePage = () => {
             aria-label="알림"
           >
             <span style={{ fontSize: 24 }}>🔔</span>
-            {allTodayNotices.length > 0 && !hasCheckedTodayNotice && (
+            {allTodayNotices.length > 0 && !hasCheckedTodayNotice && sessionStorage.getItem('hasShownTodayPopup') !== getTodayStr() && (
               <span style={{ position: 'absolute', top: 2, right: 2, background: '#ff4b4b', color: '#fff', borderRadius: '50%', fontSize: 11, width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{allTodayNotices.length}</span>
             )}
           </button>
