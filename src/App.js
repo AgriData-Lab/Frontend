@@ -7,6 +7,7 @@ import DistributionMapPage from './pages/map/DistributionMapPage.tsx';
 import PriceMapPage from './pages/map/PriceMapPage.tsx';
 import WholesalePricePage from './pages/wholesale_retail/Wholesale-price.tsx';
 import RetailPricePage from './pages/wholesale_retail/Retail-price.tsx';
+import FacilityMapPage from './pages/map/FacilityMapPage.tsx';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/map/price" element={<PriceMapPage />} />
         <Route path="/wholesale-price" element={<WholesalePricePage />} />
         <Route path="/retail-price" element={<RetailPricePage />} />
+        <Route path="/map/facility" element={<FacilityMapPage />} />
       </Routes>
     </Router>
   );
