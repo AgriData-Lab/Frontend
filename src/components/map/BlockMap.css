@@ -17,7 +17,7 @@
 }
 
 .blockmap-tab {
-  background: #fff;
+  background: hwb(0 34% 25%);
   border: 1.5px solid #f5bebe;
   border-radius: 12px;
   padding: 8px 18px;
@@ -29,7 +29,7 @@
 
 .blockmap-tab-active {
   background: #f5bebe;
-  color: #fff;
+  color: #9c3535;
   font-weight: bold;
 }
 
@@ -45,6 +45,6 @@
   width: 100%;
   height: auto;
   max-width: none;
-  background: #fff6f3;
+  background: #ac423a;
   border-radius: 24px;
 }
