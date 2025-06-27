@@ -26,7 +26,7 @@ type ChartDataType = {
   labels: string[];
   datasets: {
     label: string;
-    data: number[];
+    data: (number | null)[];
     borderColor: string;
     backgroundColor: string;
     fill: boolean;
@@ -35,7 +35,7 @@ type ChartDataType = {
 };
 
 interface PriceChartProps {
-  title: string;
+  title: React.ReactNode; 
   subtitle: string;
   data: ChartDataType;
   loading: boolean;
