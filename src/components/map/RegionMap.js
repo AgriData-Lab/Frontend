@@ -16,6 +16,7 @@ const customIcon = new L.Icon({
 const RegionMap = ({ mapType = "default" }) => {
   const [markers, setMarkers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showNoDataModal, setShowNoDataModal] = useState(false);
 
   useEffect(() => {
     const fetchMapData = async () => {
@@ -62,6 +63,14 @@ const RegionMap = ({ mapType = "default" }) => {
     fetchMapData();
   }, []);
 
+  useEffect(() => {
+    if (!loading && markers.length === 0) {
+      setShowNoDataModal(true);
+    } else {
+      setShowNoDataModal(false);
+    }
+  }, [loading, markers]);
+
   if (loading) {
     return (
       <div style={{ 
@@ -78,41 +87,84 @@ const RegionMap = ({ mapType = "default" }) => {
   }
 
   return (
-    <MapContainer 
-      center={[35.8, 127.5]} 
-      zoom={7} 
-      style={{ width: "100%", height: "100%", background: "#f8f9fa" }}
-      zoomControl={false}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        className="map-tiles"
-      />
-      {markers.map((marker) => (
-        <Marker
-          key={marker.id}
-          position={[marker.lat, marker.lng]}
-          icon={customIcon}
-        >
-          <Popup>
-            <div style={{ 
-              padding: "8px", 
-              textAlign: "center",
-              fontWeight: "500",
-              fontSize: "14px"
-            }}>
-              <div style={{ marginBottom: "4px" }}>
-                <strong>{marker.city}</strong>
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <MapContainer 
+        center={[35.8, 127.5]} 
+        zoom={7} 
+        style={{ width: "100%", height: "100%", background: "#f8f9fa" }}
+        zoomControl={false}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          className="map-tiles"
+        />
+        {markers.map((marker) => (
+          <Marker
+            key={marker.id}
+            position={[marker.lat, marker.lng]}
+            icon={customIcon}
+          >
+            <Popup>
+              <div style={{ 
+                padding: "8px", 
+                textAlign: "center",
+                fontWeight: "500",
+                fontSize: "14px"
+              }}>
+                <div style={{ marginBottom: "4px" }}>
+                  <strong>{marker.city}</strong>
+                </div>
+                <div style={{ color: "#666" }}>
+                  {marker.item}
+                </div>
               </div>
-              <div style={{ color: "#666" }}>
-                {marker.item}
-              </div>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
-    </MapContainer>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
+      {/* 모달 팝업 */}
+      {showNoDataModal && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          background: 'rgba(0,0,0,0.25)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 2000
+        }}>
+          <div style={{
+            background: '#fff',
+            border: '1px solid #ddd',
+            borderRadius: '12px',
+            padding: '28px 36px',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.12)',
+            fontSize: '17px',
+            fontWeight: 500,
+            textAlign: 'center'
+          }}>
+            관심 품목에 대한 유통시설 데이터가 없습니다.<br/>
+            <button style={{
+              marginTop: '18px',
+              background: '#ff4b4b',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              padding: '8px 24px',
+              fontSize: '15px',
+              cursor: 'pointer',
+              fontWeight: 500
+            }}
+            onClick={() => setShowNoDataModal(false)}
+            >확인</button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
