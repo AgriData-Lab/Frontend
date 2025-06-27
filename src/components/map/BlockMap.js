@@ -79,8 +79,8 @@ export default function BlockMap() {
         const g = Math.round(220 + (115 - 220) * ratio);
         const b = Math.round(235 + (181 - 235) * ratio);
         const bg = `rgb(${r},${g},${b})`;
-        const border = "2px solid #fff";
-        const color = "#fff";
+        const border = "2px solid #e63c3c";
+        const color = "#e63c3c";
         const fontSize = ratio > 0.95 ? "1.35rem" : "1.1rem";
         const icon = L.divIcon({
           className: "custom-label",
