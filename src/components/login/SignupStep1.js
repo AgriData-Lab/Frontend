@@ -1,26 +1,70 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 function SignupStep1({ form, onNext }) {
   const [localForm, setLocalForm] = useState(form);
+  const [isNameChecked, setIsNameChecked] = useState(false);
+  const [isEmailChecked, setIsEmailChecked] = useState(false);
 
   const handleChange = (e) => {
-    setLocalForm({ ...localForm, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setLocalForm({ ...localForm, [name]: value });
+
+    // 입력이 바뀌면 다시 중복확인하도록 유도
+    if (name === "name") setIsNameChecked(false);
+    if (name === "email") setIsEmailChecked(false);
   };
 
-  const handleCheckDuplicate = (type) => {
-    alert(`${type === "name" ? "닉네임" : "아이디"} 중복확인 기능은 구현 필요`);
+  const handleCheckDuplicate = async (type) => {
+    const value = type === "name" ? localForm.name : localForm.email;
+
+    if (!value) {
+      alert(`${type === "name" ? "닉네임" : "아이디"}를 입력해 주세요.`);
+      return;
+    }
+
+    try {
+      const response = await axios.get(`/users/auth/check-duplicate`, {
+        params: { type, value: value.trim() }
+      });
+
+      console.log("백엔드 응답:", response.data);
+
+      // ✅ 여기 중요: 백엔드 응답이 { result: true } 형태라면 이렇게
+      const isDuplicate = response.data.result === true;
+
+      if (isDuplicate) {
+        alert(`이미 사용 중인 ${type === "name" ? "닉네임" : "아이디"}입니다.`);
+        type === "name" ? setIsNameChecked(false) : setIsEmailChecked(false);
+      } else {
+        alert(`사용 가능한 ${type === "name" ? "닉네임" : "아이디"}입니다.`);
+        type === "name" ? setIsNameChecked(true) : setIsEmailChecked(true);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("중복 확인 중 오류가 발생했습니다.");
+    }
   };
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!localForm.name || !localForm.email || !localForm.password || !localForm.passwordCheck) {
       alert("모든 필드를 입력하세요.");
       return;
     }
+
     if (localForm.password !== localForm.passwordCheck) {
       alert("비밀번호가 일치하지 않습니다.");
       return;
     }
+
+    if (!isNameChecked || !isEmailChecked) {
+      alert("닉네임과 아이디 중복 확인을 완료해주세요.");
+      return;
+    }
+
     onNext(localForm);
   };
 
@@ -34,7 +78,6 @@ function SignupStep1({ form, onNext }) {
         minHeight: "80vh"
       }}
     >
-      {/* 상단 타이틀 */}
       <div
         style={{
           textAlign: "center",
@@ -46,7 +89,6 @@ function SignupStep1({ form, onNext }) {
         회원 가입
       </div>
 
-      {/* 상단 구분선 */}
       <div style={{
         width: "100%",
         height: "1px",
@@ -54,7 +96,6 @@ function SignupStep1({ form, onNext }) {
         marginBottom: 24
       }} />
 
-      {/* 입력 필드 */}
       <div
         style={{
           flex: 1,
@@ -96,6 +137,11 @@ function SignupStep1({ form, onNext }) {
               중복 확인
             </button>
           </div>
+          {isNameChecked && (
+            <div style={{ color: "green", fontSize: 12, marginTop: 4 }}>
+              ✅ 사용 가능한 닉네임입니다.
+            </div>
+          )}
         </div>
 
         {/* 아이디 */}
@@ -117,7 +163,7 @@ function SignupStep1({ form, onNext }) {
             />
             <button
               type="button"
-              onClick={() => handleCheckDuplicate("id")}
+              onClick={() => handleCheckDuplicate("email")}
               style={{
                 border: "1px solid #F5BEBE",
                 background: "none",
@@ -130,6 +176,11 @@ function SignupStep1({ form, onNext }) {
               중복 확인
             </button>
           </div>
+          {isEmailChecked && (
+            <div style={{ color: "green", fontSize: 12, marginTop: 4 }}>
+              ✅ 사용 가능한 아이디입니다.
+            </div>
+          )}
         </div>
 
         {/* 비밀번호 */}

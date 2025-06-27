@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from '../../api/axiosInstance';
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 // 눈 아이콘 SVG
 const EyeIcon = ({ visible, onClick }) => (
@@ -28,7 +28,10 @@ const EyeIcon = ({ visible, onClick }) => (
   </svg>
 );
 
+
+
 function LoginForm() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({ id: "", password: "" });
   const [autoLogin, setAutoLogin] = useState(false);
   const [showPw, setShowPw] = useState(false);
@@ -46,6 +49,8 @@ function LoginForm() {
       });
       localStorage.setItem("token", res.data.result.token);
       alert("로그인 성공!");
+      // 로그인 성공 후 기본맵 페이지로 이동
+      navigate("/map"); 
     } catch (err) {
       alert("로그인 실패: " + err.response?.data?.message);
     }
@@ -106,7 +111,7 @@ function LoginForm() {
           {/* 아이디 */}
           <input
             name="id"
-            placeholder="아이디"
+            placeholder="이메일"
             value={form.id}
             onChange={handleChange}
             style={{

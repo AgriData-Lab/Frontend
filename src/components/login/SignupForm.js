@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import SignupStep1 from "./SignupStep1";
 import SignupStep2 from "./SignupStep2";
 import axios from "../../api/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 const containerStyle = {
   width: "100%",
@@ -18,14 +19,18 @@ const containerStyle = {
   minHeight: "80vh" // ★★★ 모바일 웹에서 자주 사용! 전체 화면의 80% 차지하는 높이게끔 
 };
 
+
+
 function SignupForm() {
+  const navigate = useNavigate();
+  
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     passwordCheck: "",
-    region: "",
+    countyCode: "",       // ✅ 여기 수정
     interestItem: ""
   });
 
@@ -41,7 +46,8 @@ function SignupForm() {
     try {
       await axios.post("/users/auth/signup", finalForm);
       alert("회원가입 성공!");
-      // 초기화 또는 이동
+      // 성공 후 로그인 페이지 이동
+      navigate("/login");
     } catch (err) {
       alert("회원가입 실패: " + err.response?.data?.message);
     }

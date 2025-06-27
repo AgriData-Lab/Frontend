@@ -8,6 +8,7 @@ import WholesalePricePage from './pages/wholesale_retail/Wholesale-price.tsx';
 import RetailPricePage from './pages/wholesale_retail/Retail-price.tsx';
 import FacilityMapPage from './pages/map/FacilityMapPage.tsx';
 
+
 function App() {
   return (
     <Router>
