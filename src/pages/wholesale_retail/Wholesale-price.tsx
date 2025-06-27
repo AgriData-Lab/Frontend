@@ -447,7 +447,12 @@ const WholesalePricePage = () => {
       </div>
 
       <PriceChart
-        title={`${keyword} 도매가격 지역별 비교`}
+        title={
+          <span>
+                 <span style={{ color: '#9966CC', fontWeight: 'bold' }}>{keyword}</span> 도매가격 지역별 비교
+            </span>
+        }
+      
         subtitle="날짜별 도매가격 (지역별 선그래프)"
         data={chartData}
         loading={loading}
@@ -497,7 +502,12 @@ const WholesalePricePage = () => {
       )}
 
       <PriceChart
-        title={`지역별 ${keyword} 도매가격 비교`}
+      title={
+        <span>
+               <span 지역별 style={{ color: '#9966CC', fontWeight: 'bold' }}>{keyword}</span> 도매가격 비교
+          </span>
+      }
+      
         subtitle="현재, 1주전, 1개월전, 1년전 가격"
         data={regionChartData}
         loading={false}
