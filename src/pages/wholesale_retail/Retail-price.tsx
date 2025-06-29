@@ -259,10 +259,9 @@ const RetailPricePage = () => {
 
             // ✅ 라벨 추출 (가장 데이터가 많은 권역 기준)
             const regions = Object.keys(grouped);
-            let labels = grouped[regions[0]]?.map(item => item.date) || [];
-
-            // ✅ 날짜 오름차순 정렬 (YYYY-MM-DD 형식 기준)
-            labels = labels.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+            let labels = Array.from(
+              new Set(grouped[regions[0]].map(item => item.date))
+            ).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
 
             // ✅ 권역별 평균 데이터 생성
@@ -398,20 +397,36 @@ const RetailPricePage = () => {
             )
         ).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
+        const colorPalette = [
+          '#e6194b', // 빨강
+          '#3cb44b', // 초록
+          '#ffe119', // 노랑
+          '#4363d8', // 파랑
+          '#f58231', // 주황
+          '#911eb4', // 보라
+          '#46f0f0', // 청록
+          '#f032e6', // 분홍
+          '#bcf60c', // 연두
+          '#fabebe', // 살구
+          '#008080', // 청회
+          '#e6beff', // 연보라
+        ];
+
         // ⏬ 지역별 데이터셋 생성
         const datasets = regionCounties.map((county, idx) => {
-            const dataMap = new Map(regionDataByCounty[county].map(entry => [entry.date, entry.price]));
-            const data = allDates.map(date => dataMap.get(date) ?? null);
+        const color = colorPalette[idx % colorPalette.length];  // overflow 대응
+        const dataMap = new Map(regionDataByCounty[county].map(entry => [entry.date, entry.price]));
+        const data = allDates.map(date => dataMap.get(date) ?? null);
 
-            return {
-            label: county,
-            data,
-            borderColor: `rgba(${100 + idx * 30}, ${150 + idx * 20}, ${200 - idx * 15}, 1)`,
-            backgroundColor: `rgba(${100 + idx * 30}, ${150 + idx * 20}, ${200 - idx * 15}, 0.2)`,
-            fill: false,
-            tension: 0.1,
-            };
-        });
+        return {
+          label: county,
+          data,
+          borderColor: color,
+          backgroundColor: color + '33', // 20% 투명도
+          fill: false,
+          tension: 0.1,
+        };
+      });
 
         console.log('📍 지역별 날짜 수:', allDates.length);
         console.log('📍 지역별 데이터셋 수:', datasets.length);
