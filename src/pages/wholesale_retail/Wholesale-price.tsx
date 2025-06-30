@@ -393,7 +393,7 @@ const WholesalePricePage = () => {
   };
 
   return (
-    <div className="mobile-container">
+    <div className="mobile-container" style={{ minHeight: '100vh', height: '100vh',  overflowY: isSidebarOpen ? 'hidden' : 'auto' }}>
       <header className="wholesale-header">
         <button className="hamburger-menu" onClick={toggleSidebar}>☰</button>
         <div className="logo-container" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
