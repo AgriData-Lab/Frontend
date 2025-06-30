@@ -504,7 +504,7 @@ const WholesalePricePage = () => {
       <PriceChart
       title={
         <span>
-               <span 지역별 style={{ color: '#9966CC', fontWeight: 'bold' }}>{keyword}</span> 도매가격 비교
+               1년간 <span 지역별 style={{ color: '#9966CC', fontWeight: 'bold' }}>{keyword}</span> 도매가격 추이
           </span>
       }
       
