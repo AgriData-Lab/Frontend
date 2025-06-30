@@ -393,7 +393,7 @@ const WholesalePricePage = () => {
   };
 
   return (
-    <div className="mobile-container">
+    <div className="mobile-container" style={{ minHeight: '100vh', height: '100vh',  overflowY: isSidebarOpen ? 'hidden' : 'auto' }}>
       <header className="wholesale-header">
         <button className="hamburger-menu" onClick={toggleSidebar}>☰</button>
         <div className="logo-container" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -431,16 +431,16 @@ const WholesalePricePage = () => {
             value={startDate}
             onChange={e => setStartDate(e.target.value)}
             className="date-input"
-            style={{ flex: 1, minWidth: 110, maxWidth: 140 }}
+            style={{ width: 140}}
           />
           <input
             type="date"
             value={endDate}
             onChange={e => setEndDate(e.target.value)}
             className="date-input"
-            style={{ flex: 1, minWidth: 110, maxWidth: 140 }}
+            style={{ width: 140 }}
           />
-          <button onClick={handleSearch} className="search-button" style={{ minWidth: 44, fontSize: 22 }}>
+          <button onClick={handleSearch} className="search-button" style={{ width: 30, fontSize: 17 }}>
             🔍
           </button>
         </div>

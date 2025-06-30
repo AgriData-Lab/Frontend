@@ -5,8 +5,14 @@
   min-height: 100vh;
   font-family: sans-serif;
   padding-bottom: 32px;
+  
 }
 
+.mobile-container {
+  background-color: #fffaf9;
+  font-family: sans-serif;
+  padding-bottom: 32px;
+}
 .wholesale-header {
   display: flex;
   align-items: center;
@@ -94,6 +100,7 @@
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  
 }
 
 .notification-bar {
