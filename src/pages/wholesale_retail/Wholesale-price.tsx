@@ -64,7 +64,7 @@ const WholesalePricePage = () => {
   const [showModal, setShowModal] = useState(false);
   const [hasShownTodayPopup, setHasShownTodayPopup] = useState(() => {
     // sessionStorage에 기록이 있으면 true, 없으면 false
-    return sessionStorage.getItem('hasShownTodayPopup') === getTodayStr();
+    return sessionStorage.getItem('hasShownTodayPopup') === getAlertWindowDateStr(); 
   });
   const [hasCheckedTodayNotice, setHasCheckedTodayNotice] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -341,6 +341,41 @@ const WholesalePricePage = () => {
     return d.toISOString().slice(0, 10);
   }
 
+  function getAlertWindowDateStr(): string {
+    const now = new Date();
+    const threshold = new Date();
+    threshold.setHours(17, 0, 0, 0); // 오늘 17시 기준
+
+    if (now < threshold) {
+      now.setDate(now.getDate() - 1);
+    }
+    return now.toISOString().slice(0, 10); // yyyy-MM-dd
+  }
+
+
+  // 알림 시간 범위 체크 함수 (17:00 ~ 익일 16:59)
+  function isInCurrentAlertWindow(triggeredAtStr: string): boolean {
+    const triggeredAt = new Date(triggeredAtStr);
+    const now = new Date();
+
+    const start = new Date();
+    const end = new Date();
+
+    if (now.getHours() >= 17) {
+      start.setHours(17, 0, 0, 0);
+      end.setDate(start.getDate() + 1);
+      end.setHours(16, 59, 59, 999);
+    } else {
+      start.setDate(start.getDate() - 1);
+      start.setHours(17, 0, 0, 0);
+      end.setHours(16, 59, 59, 999);
+    }
+
+    return triggeredAt >= start && triggeredAt <= end;
+  }
+
+
+
   // 페이지 진입 시 오늘 알림 조회 (최초 1회만)
   useEffect(() => {
     const fetchTodayNotifications = async () => {
@@ -352,8 +387,11 @@ const WholesalePricePage = () => {
         });
         const result = res.data?.result || [];
         // 오늘 날짜에 해당하는 알림만 필터
-        const today = getTodayStr();
-        const todayNotices = result.filter((n: any) => n.triggeredAt?.startsWith(today));
+        const todayNotices = result.filter((n: any) => isInCurrentAlertWindow(n.triggeredAt));
+
+        // 내림차순 정렬 
+        todayNotices.sort((a, b) => new Date(b.triggeredAt).getTime() - new Date(a.triggeredAt).getTime());
+
         setAllTodayNotices(todayNotices);
         // 이미 보여준 알림은 제외
         const newNotices = todayNotices.filter((n: any) => !shownNotificationIds.includes(`${n.notificationId}_${n.triggeredAt}`));
@@ -361,7 +399,7 @@ const WholesalePricePage = () => {
           setPendingNotices(newNotices.map((n: any) => n.message));
           setShownNotificationIds(ids => [...ids, ...newNotices.map((n: any) => `${n.notificationId}_${n.triggeredAt}`)]);
           setHasShownTodayPopup(true);
-          sessionStorage.setItem('hasShownTodayPopup', today); // 오늘 날짜로 기록
+          sessionStorage.setItem('hasShownTodayPopup', getAlertWindowDateStr()); // 오늘 날짜로 기록
         }
       } catch (e) {
         // 무시
@@ -389,7 +427,7 @@ const WholesalePricePage = () => {
   const handleOpenModal = () => {
     setShowModal(true);
     setHasCheckedTodayNotice(true);
-    sessionStorage.setItem('hasShownTodayPopup', getTodayStr()); // 종 아이콘 뱃지도 동일하게 관리
+    sessionStorage.setItem('hasShownTodayPopup', getAlertWindowDateStr()); // 종 아이콘 뱃지도 동일하게 관리
   };
 
   return (
@@ -404,7 +442,7 @@ const WholesalePricePage = () => {
             aria-label="알림"
           >
             <span style={{ fontSize: 24 }}>🔔</span>
-            {allTodayNotices.length > 0 && !hasCheckedTodayNotice && sessionStorage.getItem('hasShownTodayPopup') !== getTodayStr() && (
+            {allTodayNotices.length > 0 && !hasCheckedTodayNotice && sessionStorage.getItem('hasShownTodayPopup') !== getAlertWindowDateStr() && (
               <span style={{ position: 'absolute', top: 2, right: 2, background: '#ff4b4b', color: '#fff', borderRadius: '50%', fontSize: 11, width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{allTodayNotices.length}</span>
             )}
           </button>
@@ -504,7 +542,7 @@ const WholesalePricePage = () => {
       <PriceChart
       title={
         <span>
-               1년간 <span 지역별 style={{ color: '#9966CC', fontWeight: 'bold' }}>{keyword}</span> 도매가격 추이
+               1년간 <span style={{ color: '#9966CC', fontWeight: 'bold' }}>{keyword}</span> 도매가격 추이
           </span>
       }
       

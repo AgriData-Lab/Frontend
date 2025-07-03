@@ -6,6 +6,14 @@
   font-family: sans-serif;
   padding-bottom: 32px;
   
+
+}
+
+.mobile-container {
+  background-color: #fffaf9;
+  font-family: sans-serif;
+  padding-bottom: 32px;
+
 }
 
 .mobile-container {
@@ -77,6 +85,7 @@
   text-align: center;
   padding: 0 16px;
   margin-top: 24px;
+  overflow-y:auto;
 }
 
 .chart-title {
