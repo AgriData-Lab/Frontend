@@ -6,13 +6,21 @@
   font-family: sans-serif;
   padding-bottom: 32px;
   
+
 }
+
+.mobile-container {
+  background-color: #fffaf9;
+  font-family: sans-serif;
+  padding-bottom: 32px;
+
+}
+
 .mobile-container {
   background-color: #fffaf9;
   font-family: sans-serif;
   padding-bottom: 32px;
 }
-
 .wholesale-header {
   display: flex;
   align-items: center;
