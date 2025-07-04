@@ -398,8 +398,10 @@ const WholesalePricePage = () => {
         if (newNotices.length > 0 && !hasShownTodayPopup) {
           setPendingNotices(newNotices.map((n: any) => n.message));
           setShownNotificationIds(ids => [...ids, ...newNotices.map((n: any) => `${n.notificationId}_${n.triggeredAt}`)]);
-          setHasShownTodayPopup(true);
-          sessionStorage.setItem('hasShownTodayPopup', getAlertWindowDateStr()); // 오늘 날짜로 기록
+          // setHasShownTodayPopup(true);
+          // sessionStorage.setItem('hasShownTodayPopup', getAlertWindowDateStr()); // 오늘 날짜로 기록
+
+          // ⚠️ sessionStorage.setItem은 실제 팝업이 뜨는 useEffect에서!
         }
       } catch (e) {
         // 무시
@@ -415,6 +417,11 @@ const WholesalePricePage = () => {
       setNotificationMsg(pendingNotices[0]);
       setNotificationMsgType('success');
       setShowToast(true);
+
+      // ✅ 여기서만 sessionStorage 기록
+      sessionStorage.setItem('hasShownTodayPopup', getAlertWindowDateStr());
+      setHasShownTodayPopup(true);
+
       const timer = setTimeout(() => {
         setShowToast(false);
         setPendingNotices(notices => notices.slice(1));
