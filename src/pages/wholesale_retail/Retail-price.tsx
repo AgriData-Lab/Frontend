@@ -601,6 +601,12 @@ const RetailPricePage = () => {
       setNotificationMsg(pendingNotices[0]);
       setNotificationMsgType('success');
       setShowToast(true);
+
+      // ✅ 알림 팝업이 진짜로 뜰 때만 기록
+      sessionStorage.setItem('hasShownTodayPopup', getAlertWindowDateStr());
+      setHasShownTodayPopup(true);
+
+
       const timer = setTimeout(() => {
         setShowToast(false);
         setPendingNotices(notices => notices.slice(1));
@@ -612,8 +618,8 @@ const RetailPricePage = () => {
   // 알림 아이콘 클릭 시
   const handleOpenModal = () => {
     setShowModal(true);
-    setHasCheckedTodayNotice(true);
-    sessionStorage.setItem('hasShownTodayPopup', getAlertWindowDateStr()); // 종 아이콘 뱃지도 동일하게 관리
+    setHasCheckedTodayNotice(true);  // ✅ 사용자가 명시적으로 확인한 상태만 기록
+    // sessionStorage.setItem('hasShownTodayPopup', getAlertWindowDateStr()); <- ❌ 제거
   };
 
 
