@@ -8,6 +8,8 @@ import WholesalePricePage from './pages/wholesale_retail/Wholesale-price.tsx';
 import RetailPricePage from './pages/wholesale_retail/Retail-price.tsx';
 import FacilityMapPage from './pages/map/FacilityMapPage.tsx';
 import AgriGuidePage from './pages/Agriguide.tsx';
+import SomaeMarketPage from './pages/map/SomaeMarketPage.tsx';
+import DomaeMarketPage from './pages/map/DomaeMarketPage.tsx';
 
 
 function App() {
@@ -22,6 +24,8 @@ function App() {
         <Route path="/retail-price" element={<RetailPricePage />} />
         <Route path="/map/facility" element={<FacilityMapPage />} />
         <Route path="/links" element={<AgriGuidePage />} />
+        <Route path="/map/somae" element={<SomaeMarketPage />} />
+        <Route path="/map/domae" element={<DomaeMarketPage />} />
       </Routes>
     </Router>
   );

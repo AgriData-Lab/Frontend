@@ -1,18 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { ExternalLink, FolderOpen, ArrowLeft } from "lucide-react";
+import Sidebar from "../components/common/SideBar.tsx";
+import Header from "../components/common/Header.tsx";
 
-// 모바일 카드형(폭 ~400px) 레이아웃에 맞춘 버전
-//  - 페이지가 세로 가운데 정렬되고, 가운데 카드가 하나 보이는 형태
-//  - 별도 UI 라이브러리 없이 동작
-
-const RESOURCES: Array<{
-  title: string;
-  url: string;
-  description: string;
-  tags: string[];
-  image?: string;
-  official?: { label: string; url: string };
-}> = [
+const RESOURCES = [
   {
     title: "서울농부포털 (도시농업)",
     url: "https://cityfarmer.seoul.go.kr/?act=main",
@@ -50,11 +41,22 @@ const RESOURCES: Array<{
   },
 ];
 
+// 스타일 모음 객체 (S) 정의 끝난 뒤
+const tagBtn = (active = false): React.CSSProperties => ({
+  padding: "6px 10px",
+  borderRadius: 999,
+  border: `1px solid ${active ? "#6b6eff" : "#e5e7eb"}`,
+  background: active ? "#eef0ff" : "#fff",
+  cursor: "pointer",
+  fontSize: 12,
+});
+
 const uniq = (arr: string[]) => Array.from(new Set(arr));
 
 export default function ResourceDirectoryNarrow() {
   const [query, setQuery] = useState("");
   const [tag, setTag] = useState<string>("전체");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const allTags = useMemo(
     () => ["전체", ...uniq(RESOURCES.flatMap((r) => r.tags))],
@@ -83,23 +85,27 @@ export default function ResourceDirectoryNarrow() {
     });
   };
 
-  // --- 스타일 정의 (기존 코드 동일) ---
   const S: Record<string, React.CSSProperties> = {
     page: {
       minHeight: "100dvh",
-      display: "grid",
-      placeItems: "center",
       background: "#f2f5f0",
-      padding: 16,
-      boxSizing: "border-box",
+      display: "flex",
+      flexDirection: "column",
       fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
     },
+    cardWrap: {
+      flex: 1,
+      display: "grid",
+      placeItems: "center",
+      padding: 16,
+      boxSizing: "border-box",
+    },
     card: {
-      width: 400,
+      width: 430,
       maxWidth: "100%",
-      background: "#fff",
-      height: 800,
-      borderRadius: 20,
+      background: "#fff6f3",
+      // height: 800,
+      height: "95%",  
       boxShadow: "0 12px 30px rgba(0,0,0,0.08)",
       overflow: "hidden",
       border: "1px solid #e9ecef",
@@ -126,7 +132,7 @@ export default function ResourceDirectoryNarrow() {
       flex: 1,
       display: "flex",
       flexDirection: "column",
-      overflowY: "auto",   // ← 세로 스크롤 허용
+      overflowY: "auto",
       gap: 12,
     },
     inputWrap: { display: "flex", gap: 8, marginBottom: 10 },
@@ -140,14 +146,6 @@ export default function ResourceDirectoryNarrow() {
       outline: "none",
     },
     tagRow: { display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 },
-    tagBtn: (active = false): React.CSSProperties => ({
-      padding: "6px 10px",
-      borderRadius: 999,
-      border: `1px solid ${active ? "#6b6eff" : "#e5e7eb"}`,
-      background: active ? "#eef0ff" : "#fff",
-      cursor: "pointer",
-      fontSize: 12,
-    }),
     list: { display: "flex", flexDirection: "column", gap: 10 },
     item: {
       border: "1px solid #eef1f4",
@@ -216,100 +214,108 @@ export default function ResourceDirectoryNarrow() {
     },
   } as const;
 
-  const tagBtn = (active = false): React.CSSProperties => S.tagBtn(active);
-
   return (
     <div style={S.page}>
-      <div style={S.card}>
-        {/* 상단 헤더 */}
-        <div style={S.header}>
-          <button
-            onClick={() => window.history.back()}
-            style={{ background: "none", border: 0, cursor: "pointer" }}
-            aria-label="뒤로가기"
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <div style={S.headerTitle}>안내 링크</div>
-          <div style={{ width: 18 }} />
-        </div>
+      {/* 🔹 상단바 */}
+      <Header
+        toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        isOpen={isSidebarOpen}
+      />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-        {/* 본문 */}
-        <div style={S.body}>
-          <div style={S.inputWrap}>
-            <input
-              placeholder="검색: 기관명 / 주제 / 지역 ..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              style={S.input}
-            />
+      {/* 🔹 본문 카드 */}
+      <div style={S.cardWrap}>
+        <div style={S.card}>
+          {/* 카드 헤더 */}
+          <div style={S.header}>
+            <button
+              onClick={() => window.history.back()}
+              style={{ background: "none", border: 0, cursor: "pointer" }}
+              aria-label="뒤로가기"
+            >
+              <ArrowLeft size={18} />
+            </button>
+            <div style={S.headerTitle}>안내 링크</div>
+            <div style={{ width: 18 }} />
           </div>
 
-          <div style={S.tagRow}>
-            {allTags.map((t) => (
-              <button
-                key={t}
-                style={tagBtn(t === tag)}
-                onClick={() => setTag(t)}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
+          {/* 카드 본문 */}
+          <div style={S.body}>
+            <div style={S.inputWrap}>
+              <input
+                placeholder="검색: 기관명 / 주제 / 지역 ..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                style={S.input}
+              />
+            </div>
 
-          <div style={S.list}>
-            {filtered.map((r) => (
-              <div key={r.title} style={S.item}>
-                <div style={S.iconBox}>{r.image ?? "🔗"}</div>
-                <div>
-                  <h3 style={S.title}>{r.title}</h3>
-                  <p style={S.desc}>{r.description}</p>
-                  <div style={S.badgeRow}>
-                    {r.tags.map((t) => (
-                      <span key={t} style={S.badge}>
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                  <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                    <a
-                      href={r.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <button style={S.btnPrimary}>
-                        <ExternalLink size={16} /> 바로가기
-                      </button>
-                    </a>
-                    {r.official && (
+            <div style={S.tagRow}>
+              {allTags.map((t) => (
+                <button
+                  key={t}
+                  style={tagBtn(t === tag)}
+                  onClick={() => setTag(t)}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+
+            <div style={S.list}>
+              {filtered.map((r) => (
+                <div key={r.title} style={S.item}>
+                  <div style={S.iconBox}>{r.image ?? "🔗"}</div>
+                  <div>
+                    <h3 style={S.title}>{r.title}</h3>
+                    <p style={S.desc}>{r.description}</p>
+                    <div style={S.badgeRow}>
+                      {r.tags.map((t) => (
+                        <span key={t} style={S.badge}>
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
                       <a
-                        href={r.official.url}
+                        href={r.url}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <button style={S.btn}>{r.official.label}</button>
+                        <button style={S.btnPrimary}>
+                          <ExternalLink size={16} /> 바로가기
+                        </button>
                       </a>
-                    )}
+                      {r.official && (
+                        <a
+                          href={r.official.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <button style={S.btn}>{r.official.label}</button>
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* 하단 버튼 바 */}
-        <div style={S.footerBar}>
-          <button style={S.btn} onClick={openAllFiltered}>
-            <FolderOpen size={16} /> 전체 열기 ({filtered.length})
-          </button>
-          <a
-            href="https://forms.gle/"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ flex: 1 }}
-          >
-            <button style={S.btn}>새 링크 제안</button>
-          </a>
+          {/* 카드 하단 */}
+          <div style={S.footerBar}>
+            <button style={S.btn} onClick={openAllFiltered}>
+              <FolderOpen size={16} /> 전체 열기 ({filtered.length})
+            </button>
+            <a
+              href="https://forms.gle/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ flex: 1 }}
+            >
+              <button style={S.btn}>새 링크 제안</button>
+            </a>
+          </div>
         </div>
       </div>
     </div>

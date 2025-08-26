@@ -4,10 +4,11 @@
   left: -280px;
   height: 100vh;
   width: 280px;
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: #FFF6F3;       /* 살짝 톤 맞추기 (선택) */
   transition: left 0.3s ease-in-out;
-  z-index: 9999;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  z-index: 9100;                   /* 백드롭(9000) 위 */
+  box-shadow: 2px 0 24px rgba(0,0,0,0.18);
+  overflow-y: auto;
 }
 
 .sidebar.open {
@@ -17,6 +18,23 @@
 .sidebar-content {
   padding: 20px;
   padding-top: 60px;
+}
+
+/* ✅ 화면 전체를 덮는 백드롭 */
+.sidebar-backdrop {
+  position: fixed;         /* 부모 아닌 화면 기준 */
+  inset: 0;                /* top/right/bottom/left: 0 */
+  background: rgba(0, 0, 0, 0.35);  /* 살짝 어둡게 */
+  backdrop-filter: blur(1px);       /* 선택: 부드러운 느낌 */
+  z-index: 9000;           /* 헤더(1000)와 컨텐츠보다 높게 */
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+/* 필요 시 애니메이션용 상태 클래스 */
+.sidebar-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .filter-buttons {
@@ -37,15 +55,8 @@
   transition: all 0.2s ease;
 }
 
-.filter-btn:hover {
-  background: #f8f8f8;
-}
-
-.filter-btn.active {
-  background: #ff4b4b;
-  color: white;
-  border-color: #ff4b4b;
-}
+.filter-btn:hover { background: #f8f8f8; }
+.filter-btn.active { background: #ff4b4b; color: #fff; border-color: #ff4b4b; }
 
 .menu-items {
   margin-top: 30px;
@@ -64,3 +75,14 @@
 .menu-item:hover {
   color: #ff4b4b;
 } 
+
+/* 소매/도매 페이지에서는 폭 430px 영역 안 */
+.page-somae .sidebar,
+.page-domae .sidebar {
+  left: calc((100% - 430px) / 2 - 280px); /* 카드 왼쪽 바깥에서 시작 */
+}
+
+.page-somae .sidebar.open,
+.page-domae .sidebar.open {
+  left: calc((100% - 430px) / 2); /* 카드 왼쪽 경계까지 */
+}
