@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+
+
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -9,6 +11,17 @@ interface SidebarProps {
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const isNarrowPage = location.pathname.includes("/map/somae") || location.pathname.includes("/map/domae");
+
+  const sidebarStyle: React.CSSProperties = isNarrowPage
+    ? {
+        left: isOpen ? "calc((100% - 430px) / 2)" : "calc((100% - 430px) / 2 - 280px)",
+        width: 280,
+      }
+    : {
+        left: isOpen ? 0 : -280,
+        width: 280,
+      };
 
   useEffect(() => {
     const root = document.getElementById('root');
@@ -46,6 +59,9 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     { path: '/map/price', label: '전국 시세 분포' },
     { path: '/retail-price',label: '구매 시세' },// 추후 api 수정
     { path: '/wholesale-price',label: '출하 시세' },// 추후 api 수정
+    { path: '/map/somae',label: '(서울) 소매 시장 밀도' },
+    { path: '/map/domae',label: '(서울) 도매 시장 정보' },
+    { path: '/links',label: '(서울) 도시 농업 프로그램 안내' },
   ];
 
   if (!isOpen) return null;
