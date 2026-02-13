@@ -1,4 +1,3 @@
-Agridata_frontend
 <p align="center">
   <img src="docs/images/pic3.png" width="700"/>
 </p>
