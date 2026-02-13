@@ -17,8 +17,6 @@ Agridata_frontend
 <p align="center">
   <img src="docs/images/pic2.png" width="700"/>
 </p>
-
 <p align="center">
   <img src="docs/images/pic1.png" width="700"/>
 </p>
-
